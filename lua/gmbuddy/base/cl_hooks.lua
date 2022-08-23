@@ -7,7 +7,7 @@ hook.Add("CalcView", "GMBuddy.CalcView", function(ply, origin, angles, fov, znea
 	if !GMBuddy.bMenu then return end
 	local view = {
 		origin = GMBuddy.CameraPos,
-		angles = Angle(90, 0, 0),
+		angles = GMBuddy.CameraAng,
 		fov = fov,
 		drawviewer = true
 	}

@@ -12,8 +12,8 @@ net.Receive("GMBuddy.MenuToggle", function(len, ply)
 	local state = net.ReadBool()
 	if state then
 		ply:DropToFloor()
-		ply:SetLocalVelocity(Vector(0,0,0))
-		print(ply:GetVelocity())
+		ply:SetAbsVelocity(Vector(0,0,0))
+		ply:ResetSequence("idle")
 	end
 	ply:SetNWBool("GMBuddy.MenuToggle", state)
 end)

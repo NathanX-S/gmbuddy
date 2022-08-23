@@ -6,15 +6,17 @@ concommand.Add("gmb_menu", function(ply, cmd, args)
 	net.WriteBool(!GMBuddy.bMenu)
 	net.SendToServer()
 	GMBuddy.bMenu = !GMBuddy.bMenu
-	GMBuddy.CameraPos = LocalPlayer():GetPos()
-	local tr = util.TraceLine({
-		start = LocalPlayer():GetPos(),
-		endpos = LocalPlayer():GetPos() + LocalPlayer():GetAngles():Up() * 100000,
-		mask = MASK_NPCWORLDSTATIC,
-	})
-	ply:ResetSequenceInfo()
-	ply:ResetSequence(PLAYER_IDLE)
-	GMBuddy.CameraPos = tr.HitPos
+	if GMBuddy.bMenu and GMBuddy.CameraPos == Vector(0, 0, 0) then
+		local startPos = LocalPlayer():GetPos()
+		local tr = util.TraceLine({
+			start = LocalPlayer():GetPos(),
+			endpos = LocalPlayer():GetPos() + LocalPlayer():GetAngles():Up() * 100000,
+			mask = MASK_NPCWORLDSTATIC,
+		})
+		GMBuddy.CameraPos = tr.HitPos
+		GMBuddy.CameraPos.z = math.min(tr.HitPos.z, 1000)
+		GMBuddy.CameraAng = Angle(45, LocalPlayer():EyeAngles().yaw, 0)
+	end
 	if !GMBuddy.Menu then
 		net.Start("GMBuddy.MenuRequest")
 		net.SendToServer()
