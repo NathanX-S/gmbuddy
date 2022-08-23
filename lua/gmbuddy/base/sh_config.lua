@@ -1,0 +1,1 @@
+GMBuddy.Config = {}
