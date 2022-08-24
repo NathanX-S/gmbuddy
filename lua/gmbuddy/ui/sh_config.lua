@@ -20,11 +20,13 @@ GMBuddy.Config.Menu.Categories = {
 	},
 	Objects = {
 		Icon = "gmbuddy/person-solid.png",
-		Width = 32
+		Width = 32,
+		Children = {}
 	},
 	Groups = {
 		Icon = "gmbuddy/people-group-solid.png",
-		Width = 64
+		Width = 64,
+		Children = {}
 	}
 }
 GMBuddy.Config.Colors = {}

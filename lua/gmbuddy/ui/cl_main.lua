@@ -44,6 +44,17 @@ net.Receive("GMBuddy.MenuResponse", function(len, ply)
 	GMBuddy.Menu:SetVisible(!GMBuddy.Menu:IsVisible())
 end)
 
+local function UpdateTree(tree)
+	tree.RootNode:Clear()
+	for k, v in pairs(cfg.Categories[selectedOption].Children) do
+		local parent = tree:AddNode(v.Name)
+		for key, value in pairs(v.Children) do
+			PrintTable(value)
+			local node = parent:AddNode(value.Name)
+		end
+	end
+end
+
 function GMBuddy.CreateMenu()
 	local container = vgui.Create("DPanel")
 	local tree = vgui.Create("GMBTree", container)
@@ -73,11 +84,10 @@ function GMBuddy.CreateMenu()
 			btn:NoClipping(true)
 			btn.DoClick = function()
 				surface.PlaySound("UI/buttonclick.wav")
-				PrintTable(options)
-				print(options[selectedOption])
 				options[selectedOption].m_Image:SetImageColor(cfg.Colors["UnselectedCat"])
 				selectedOption = k
 				btn.m_Image:SetImageColor(color_white)
+				UpdateTree(tree)
 			end
 			local oldPaint = btn.Paint
 			function btn:Paint(w, h)
@@ -87,21 +97,19 @@ function GMBuddy.CreateMenu()
 			btn:Dock(LEFT)
 			btn:DockMargin(42, 0, 0, 0)
 			options[k] = btn
+			UpdateTree(tree)
 		end
 	end)
+
 	function pnl:Paint(w, h)
-		//draw.RoundedBox(0, pnl:GetX(), pnl:GetY(), w, h, color_white)
 	end
 	function tree:Paint(w, h)
 	end
-	local node = tree:AddNode( "Node One" )
-	node:SizeToContents()
-	local cnode = node:AddNode( "Node 2.1" )
+
 	container:SetSize(ScrW() * 0.175, ScrH() * 0.98)
 	container:SetX(ScrW() * 0.8125)
 	container:CenterVertical()
 	function container:Paint(w, h)
-		//draw.RoundedBox(0, pnl:GetX(), pnl:GetY(), w, h, color_white)
 		surface.SetDrawColor(0, 0, 0, 200)
 		surface.DrawRect(0, 0, w, h)
 		surface.SetDrawColor(0, 0, 0, 255)
