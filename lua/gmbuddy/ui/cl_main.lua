@@ -6,8 +6,8 @@ concommand.Add("gmb_menu", function(ply, cmd, args)
 	net.WriteBool(!GMBuddy.bMenu)
 	net.SendToServer()
 	GMBuddy.bMenu = !GMBuddy.bMenu
+	gui.EnableScreenClicker(GMBuddy.bMenu)
 	if GMBuddy.bMenu and GMBuddy.CameraPos == Vector(0, 0, 0) then
-		local startPos = LocalPlayer():GetPos()
 		local tr = util.TraceLine({
 			start = LocalPlayer():GetPos(),
 			endpos = LocalPlayer():GetPos() + LocalPlayer():GetAngles():Up() * 100000,
@@ -33,9 +33,6 @@ concommand.Add("gmb_reload", function(ply, cmd, args)
 	cfg = GMBuddy.Config.Menu
 	GMBuddy.CreateMenu()
 	GMBuddy.Menu:Show()
-	GMBuddy.CameraPos = LocalPlayer():GetPos()
-	local max = game.GetWorld():OBBMaxs()
-	//GMBuddy.CameraPos.y = max.y
 end)
 
 net.Receive("GMBuddy.MenuResponse", function(len, ply)
@@ -58,7 +55,6 @@ function GMBuddy.CreateMenu()
 	pnl:SetTall(ScrH() * 0.06)
 	pnl:DockPadding(ScrW() * 0.003, ScrH() * 0.007, ScrW() * 0.003, ScrH() * 0.003)
 	pnl:DockMargin(0, 0, 0, ScrH() * 0.015)
-	//grid:SetColWide( 64 )
 
 	timer.Simple(0, function()
 		local fullWidth = pnl:GetWide()
@@ -67,8 +63,8 @@ function GMBuddy.CreateMenu()
 			fullWidth = fullWidth - v.Width
 			btn:SetStretchToFit(true)
 			btn:SetKeepAspect(false)
-			btn:SetSize(v.Width, 64)			-- OPTIONAL: Use instead of SizeToContents() if you know/want to fix the size
-			btn:SetImage( v.Icon )	-- Set the material - relative to /materials/ directory
+			btn:SetSize(v.Width, 64)
+			btn:SetImage(v.Icon)
 			if k ~= selectedOption then
 				btn.m_Image:SetImageColor(cfg.Colors["UnselectedCat"])
 			else
@@ -94,20 +90,17 @@ function GMBuddy.CreateMenu()
 		end
 	end)
 	function pnl:Paint(w, h)
-		//print(pnl:GetX(), pnl:GetY(), w, h, 2)
 		//draw.RoundedBox(0, pnl:GetX(), pnl:GetY(), w, h, color_white)
 	end
 	function tree:Paint(w, h)
 	end
 	local node = tree:AddNode( "Node One" )
-	//node.Label:SetContentAlignment(0)
 	node:SizeToContents()
 	local cnode = node:AddNode( "Node 2.1" )
 	container:SetSize(ScrW() * 0.175, ScrH() * 0.98)
 	container:SetX(ScrW() * 0.8125)
 	container:CenterVertical()
 	function container:Paint(w, h)
-		//print(pnl:GetX(), pnl:GetY(), w, h, 2)
 		//draw.RoundedBox(0, pnl:GetX(), pnl:GetY(), w, h, color_white)
 		surface.SetDrawColor(0, 0, 0, 200)
 		surface.DrawRect(0, 0, w, h)
@@ -115,12 +108,6 @@ function GMBuddy.CreateMenu()
 		surface.DrawRect(0, ScrH() * 0.075, w, 2)
 		surface.DrawOutlinedRect(0, 0, w, h, 2)
 	end
-	/*for i=0, 100 do
-		local DButton = scroll:Add( "DButton" )
-		DButton:SetText( "Button #" .. i )
-		DButton:Dock( TOP )
-		DButton:DockMargin( 0, 0, 0, 1 )
-	end*/
 	GMBuddy.Menu = container
 end
 
