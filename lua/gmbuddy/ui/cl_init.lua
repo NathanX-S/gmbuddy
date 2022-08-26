@@ -1,10 +1,8 @@
-GMBuddy.Elements = {}
+GMBuddy.Menu = nil
 GMBuddy.bMenu = false
 GMBuddy.bHUD = false
 GMBuddy.CameraPos = Vector(0, 0, 0)
 GMBuddy.CameraAng = Angle(0 , 0, 0)
-GMBuddy.SPAWN_MENU = 1
-GMBuddy.EDIT_MENU = 2
 
 list.Set("DesktopWindows", "GMBuddyIcon", {
 	title = "GMBuddy HUD",

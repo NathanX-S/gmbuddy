@@ -1,10 +1,6 @@
 local cfg = GMBuddy.Config.Menu
 local selectedOption = "Objects"
-local function ToggleElements()
-	for k, v in pairs(GMBuddy.Elements) do
-		v:SetVisible(GMBuddy.bMenu)
-	end
-end
+
 concommand.Add("gmb_menu", function(ply, cmd, args)
 	GMBuddy.bMenu = !GMBuddy.bMenu
 	net.Start("GMBuddy.MenuToggle")
@@ -21,32 +17,30 @@ concommand.Add("gmb_menu", function(ply, cmd, args)
 		GMBuddy.CameraPos.z = math.min(tr.HitPos.z, 1000)
 		GMBuddy.CameraAng = Angle(45, LocalPlayer():EyeAngles().yaw, 0)
 	end
-	if #GMBuddy.Elements == 0 then
+	if !GMBuddy.Menu then
 		net.Start("GMBuddy.MenuRequest")
 		net.SendToServer()
 	else
-		ToggleElements()
+		GMBuddy.Menu:SetVisible(!GMBuddy.Menu:IsVisible())
 	end
 end)
 
 concommand.Add("gmb_reload", function(ply, cmd, args)
-	if #GMBuddy.Elements > 0 then
-		for k, v in pairs(GMBuddy.Elements) do
-			v:Remove()
-		end
+	if GMBuddy.Menu then
+		GMBuddy.Menu:Remove()
 	end
 	cfg = GMBuddy.Config.Menu
-	GMBuddy.CreateElements()
-	ToggleElements()
+	GMBuddy.CreateMenu()
+	GMBuddy.Menu:SetVisible(!GMBuddy.Menu:IsVisible())
 end)
 
 net.Receive("GMBuddy.MenuResponse", function(len, ply)
-	if #GMBuddy.Elements == 0 then
-		GMBuddy.CreateElements()
+	if !GMBuddy.Menu then
+		GMBuddy.CreateMenu()
 		return
 	end
 	GMBuddy.bMenu = LocalPlayer():GetNWBool("GMBuddy.MenuToggle", false)
-	ToggleElements()
+	GMBuddy.Menu:SetVisible(!GMBuddy.Menu:IsVisible())
 end)
 
 local function UpdateTree(tree)
@@ -59,8 +53,12 @@ local function UpdateTree(tree)
 	end
 end
 
-function GMBuddy.CreateElements()
-	local spawn_menu = vgui.Create("DPanel")
+function GMBuddy.CreateMenu()
+	local container = vgui.Create("DPanel")
+	container:SetSize(ScrW(), ScrH())
+	function container:Paint(w, h)
+	end
+	local spawn_menu = vgui.Create("DPanel", container)
 	local tree = vgui.Create("GMBTree", spawn_menu)
 	local options = {}
 	tree:Dock(FILL)
@@ -120,7 +118,8 @@ function GMBuddy.CreateElements()
 		surface.DrawRect(0, ScrH() * 0.075, w, 2)
 		surface.DrawOutlinedRect(0, 0, w, h, 2)
 	end
-	GMBuddy.Elements[GMBuddy.SPAWN_MENU] = spawn_menu
+	GMBuddy.Menu = container
+	GMBuddy.Menu.SpawnMenu = spawn_menu
 end
 
 hook.Add("HUDPaintBackground", "GMBuddy.MenuPaint", function()
@@ -143,7 +142,8 @@ end)
 
 hook.Add("VGUIMousePressed", "GMB.VGUI.Press", function(pnl, mouseCode)
 	if !IsValid(pnl) then return end
-	if pnl:GetParent() == GMBuddy.Elements[GMBuddy.SPAWN_MENU] and pnl:GetName() == "GMBTree" then
+	if !GMBuddy.Menu then return end
+	if pnl:GetParent() == GMBuddy.Menu.SpawnMenu and pnl:GetName() == "GMBTree" then
 		pnl:SetSelectedItem(nil)
 	end
 end)
