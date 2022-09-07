@@ -56,13 +56,19 @@ end
 function GMBuddy.CreateMenu()
 	local container = vgui.Create("DPanel")
 	container:SetSize(ScrW(), ScrH())
+	container:SetCursor("hand")
 	function container:Paint(w, h)
 	end
 	local spawn_menu = vgui.Create("DPanel", container)
-	local tree = vgui.Create("GMBTree", spawn_menu)
+	local edit_menu = vgui.Create("DPanel", container)
+	local spawn_tree = vgui.Create("GMBTree", spawn_menu)
 	local options = {}
-	tree:Dock(FILL)
-	tree:SetLineHeight(24)
+	spawn_tree:Dock(FILL)
+	spawn_tree:SetLineHeight(24)
+	local edit_tree = vgui.Create("GMBTree", edit_menu)
+	edit_tree:Dock(FILL)
+	edit_tree:SetLineHeight(24)
+
 	local pnl = vgui.Create("DPanel", spawn_menu)
 	pnl:Dock(TOP)
 	pnl:SetTall(ScrH() * 0.06)
@@ -89,7 +95,7 @@ function GMBuddy.CreateMenu()
 				options[selectedOption].m_Image:SetImageColor(cfg.Colors["UnselectedCat"])
 				selectedOption = k
 				btn.m_Image:SetImageColor(color_white)
-				UpdateTree(tree)
+				UpdateTree(spawn_tree)
 			end
 			local oldPaint = btn.Paint
 			function btn:Paint(w, h)
@@ -99,13 +105,15 @@ function GMBuddy.CreateMenu()
 			btn:Dock(LEFT)
 			btn:DockMargin(42, 0, 0, 0)
 			options[k] = btn
-			UpdateTree(tree)
+			UpdateTree(spawn_tree)
 		end
 	end)
 
 	function pnl:Paint(w, h)
 	end
-	function tree:Paint(w, h)
+	function spawn_tree:Paint(w, h)
+	end
+	function edit_tree:Paint(w, h)
 	end
 
 	spawn_menu:SetSize(ScrW() * 0.175, ScrH() * 0.98)
@@ -118,9 +126,30 @@ function GMBuddy.CreateMenu()
 		surface.DrawRect(0, ScrH() * 0.075, w, 2)
 		surface.DrawOutlinedRect(0, 0, w, h, 2)
 	end
+	edit_menu:SetSize(ScrW() * 0.175, ScrH() * 0.98)
+	edit_menu:SetX(ScrW() * 0.0125)
+	edit_menu:CenterVertical()
+	function edit_menu:Paint(w, h)
+		surface.SetDrawColor(0, 0, 0, 200)
+		surface.DrawRect(0, 0, w, h)
+		surface.SetDrawColor(0, 0, 0, 255)
+		surface.DrawOutlinedRect(0, 0, w, h, 2)
+	end
 	GMBuddy.Menu = container
 	GMBuddy.Menu.SpawnMenu = spawn_menu
+	GMBuddy.Menu.EditMenu = edit_menu
 end
+
+local elements = {
+	["CHudGMod"] = true,
+	["CHudCrosshair"] = true
+}
+
+hook.Add( "HUDShouldDraw", "HideHUD", function( name )
+	if !GMBuddy.bMenu then return end
+	// Disable all GMOD HUD related hooks while in Buddy Menu.
+	if elements[name] then return false end
+end)
 
 hook.Add("HUDPaintBackground", "GMBuddy.MenuPaint", function()
 	if !GMBuddy.bMenu then return end
@@ -143,7 +172,7 @@ end)
 hook.Add("VGUIMousePressed", "GMB.VGUI.Press", function(pnl, mouseCode)
 	if !IsValid(pnl) then return end
 	if !GMBuddy.Menu then return end
-	if pnl:GetParent() == GMBuddy.Menu.SpawnMenu and pnl:GetName() == "GMBTree" then
+	if (pnl:GetParent() == GMBuddy.Menu.SpawnMenu or pnl:GetParent() == GMBuddy.Menu.EditMenu) and pnl:GetName() == "GMBTree" then
 		pnl:SetSelectedItem(nil)
 	end
 end)

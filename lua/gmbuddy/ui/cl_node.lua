@@ -27,7 +27,7 @@ function PANEL:Init()
 
 	self:SetDoubleClickToOpen( false )
 
-	
+
 	self.Label = vgui.Create( "DTree_Node_Button", self )
 	self.Label:SetDragParent( self )
 	self.Label.DoClick = function() self:InternalDoClick() end
