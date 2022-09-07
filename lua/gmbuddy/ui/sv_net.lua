@@ -29,8 +29,8 @@ net.Receive("GMBuddy.ModuleRequest", function(len, ply)
 	local ang = net.ReadAngle()
 	if ang.x == 0 and ang.y == 0 and ang.z == 0 then ang = nil end
 
-	local props = net.ReadString()
-	props = util.JSONToTable(util.Decompress(props))
+	local options = net.ReadString()
+	options = util.JSONToTable(util.Decompress(options))
 
 	local ent = ents.Create(class)
 
@@ -38,6 +38,6 @@ net.Receive("GMBuddy.ModuleRequest", function(len, ply)
 	if ang then
 		ent:SetAngles(ang)
 	end
-	ent:ConsumeProps(props)
+	ent:ConsumeOptions(options)
 	ent:Spawn()
 end)
