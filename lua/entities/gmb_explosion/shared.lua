@@ -1,6 +1,7 @@
 ENT.Type = "anim"
-ENT.Base = "base_gmodentity"
+ENT.Base = "gmb_base"
 
 ENT.PrintName = "GMBuddy Explosion"
-ENT.Author = "Eris"
-ENT.Spawnable = false
+
+function ENT:ConsumeOption(key, value)
+end
