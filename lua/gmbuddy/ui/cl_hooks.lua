@@ -1,6 +1,7 @@
 local elements = {
 	["CHudGMod"] = true,
-	["CHudCrosshair"] = true
+	["CHudCrosshair"] = true,
+	["CHudWeaponSelection"] = true
 }
 
 local startAng = 0
