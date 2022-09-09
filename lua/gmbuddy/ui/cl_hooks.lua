@@ -98,6 +98,11 @@ hook.Add("CalcView", "GMBuddy.CalcView", function(ply, origin, angles, fov, znea
 	return view
 end)
 
+hook.Add("SpawnMenuOpen", "GMBuddy.CancelSpawnMenu", function()
+	if !GMBuddy.bMenu then return end
+	return false
+end)
+
 if !DarkRP then return end
 
 local GUIToggled = false
@@ -120,4 +125,16 @@ function GAMEMODE:ShowSpare1()
 		mouseX, mouseY = gui.MousePos()
 	end
 	gui.EnableScreenClicker(GUIToggled)
+end
+
+function GAMEMODE:ShowSpare2()
+	if GMBuddy.bMenu then return end
+	local jobTable = LocalPlayer():getJobTable()
+
+	// We need to check for the existance of jobTable here, because in very rare edge cases, the player's team isn't set, when the getJobTable-function is called here.
+	if jobTable and jobTable.ShowSpare2 then
+		return jobTable.ShowSpare2(LocalPlayer())
+	end
+
+	DarkRP.toggleF4Menu()
 end
