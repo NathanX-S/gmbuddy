@@ -38,7 +38,7 @@ concommand.Add("gmb_reload", function(ply, cmd, args)
 	if GMBuddy.Menu then
 		GMBuddy.Menu:Remove()
 	end
-	cfg = GMBuddy.Config.Menu
+	cfg = GMBuddy.Config
 	GMBuddy.CreateMenu()
 	GMBuddy.Menu:SetVisible(!GMBuddy.Menu:IsVisible())
 end)

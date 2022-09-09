@@ -1,4 +1,5 @@
 local cfg = GMBuddy.Config
+local move_mult = cfg.Cam.MoveMult
 
 hook.Add( "HUDShouldDraw", "GMBuddy.HideHUD", function( name )
 	if !GMBuddy.bMenu then return end
@@ -29,9 +30,8 @@ hook.Add("CreateMove", "GMBuddy.CreateMove", function(cmd)
 
 	if GMBuddy.bCam then
 		local a = Angle(GMBuddy.CameraAng.x, GMBuddy.CameraAng.y, GMBuddy.CameraAng.z)
-		local mult = cfg.Cam.MoveMult
-		local fwd = (a:Forward() * mult)
-		local right = (a:Right() * mult)
+		local fwd = (a:Forward() * move_mult)
+		local right = (a:Right() * move_mult)
 		if cmd:GetForwardMove() > 0 then
 			GMBuddy.CameraPos = GMBuddy.CameraPos + fwd
 		elseif cmd:GetForwardMove() < 0 then
@@ -56,6 +56,9 @@ hook.Add("InputMouseApply", "GMBuddy.MouseInput", function(cmd, x, y)
 	if !GMBuddy.bCam then return end
 	cmd:SetMouseX(0)
 	cmd:SetMouseY(0)
+	if cmd:GetMouseWheel() > 0 or cmd:GetMouseWheel() < 0 then
+		move_mult = math.Clamp(move_mult + (cmd:GetMouseWheel() * 0.1), 1, 100)
+	end
 
 	GMBuddy.CameraAng.pitch = math.Clamp(GMBuddy.CameraAng.pitch + (y * 0.01), -90, 90)
 	GMBuddy.CameraAng.yaw = (GMBuddy.CameraAng.yaw - (x * 0.01)) % 360
