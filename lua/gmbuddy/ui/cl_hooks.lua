@@ -36,23 +36,17 @@ hook.Add("CreateMove", "GMBuddy.CreateMove", function(cmd)
 	if !GMBuddy.bMenu then return end
 	local a = Angle(GMBuddy.CameraAng.x, GMBuddy.CameraAng.y, GMBuddy.CameraAng.z)
 	//a:Normalize()
-	a.yaw = math.rad(a.yaw)
-	a.pitch = math.rad(a.pitch)
-	local forward_inc = Vector(math.cos(a.yaw) * math.cos(a.pitch),
-	math.sin(a.yaw) * math.cos(a.pitch),
-	-math.sin(a.pitch))
-	local right_inc = Vector(math.sin(a.yaw),
-	-math.cos(a.yaw),
-	0)
+	//a.yaw = math.rad(a.yaw)
+	//a.pitch = math.rad(a.pitch)
 	if cmd:GetForwardMove() > 0 then
-		GMBuddy.CameraPos = GMBuddy.CameraPos + (forward_inc * 10)
+		GMBuddy.CameraPos = GMBuddy.CameraPos + (a:Forward() * 10)
 	elseif cmd:GetForwardMove() < 0 then
-		GMBuddy.CameraPos = GMBuddy.CameraPos - (forward_inc * 10)
+		GMBuddy.CameraPos = GMBuddy.CameraPos - (a:Forward() * 10)
 	end
 	if cmd:GetSideMove() > 0 then
-		GMBuddy.CameraPos = GMBuddy.CameraPos + (right_inc * 10)
+		GMBuddy.CameraPos = GMBuddy.CameraPos + (a:Right() * 10)
 	elseif cmd:GetSideMove() < 0 then
-		GMBuddy.CameraPos = GMBuddy.CameraPos - (right_inc * 10)
+		GMBuddy.CameraPos = GMBuddy.CameraPos - (a:Right() * 10)
 	end
 	cmd:ClearButtons()
 	cmd:ClearMovement()
