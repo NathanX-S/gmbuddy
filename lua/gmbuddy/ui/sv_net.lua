@@ -11,7 +11,6 @@ net.Receive("GMBuddy.MenuToggle", function(len, ply)
 	if !GMBuddy.PermsCheck(ply) then return end
 	local state = net.ReadBool()
 	if state then
-		ply:DropToFloor()
 		ply:SetAbsVelocity(Vector(0,0,0))
 		ply:ResetSequence("idle")
 	end

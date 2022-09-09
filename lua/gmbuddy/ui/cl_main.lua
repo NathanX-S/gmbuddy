@@ -26,6 +26,14 @@ concommand.Add("gmb_menu", function(ply, cmd, args)
 end)
 
 concommand.Add("gmb_reload", function(ply, cmd, args)
+	local tr = util.TraceLine({
+		start = LocalPlayer():GetPos(),
+		endpos = LocalPlayer():GetPos() + LocalPlayer():GetAngles():Up() * 100000,
+		mask = MASK_NPCWORLDSTATIC,
+	})
+	GMBuddy.CameraPos = tr.HitPos
+	GMBuddy.CameraPos.z = math.min(tr.HitPos.z, 1000)
+	GMBuddy.CameraAng = Angle(45, LocalPlayer():EyeAngles().yaw, 0)
 	if GMBuddy.Menu then
 		GMBuddy.Menu:Remove()
 	end
@@ -47,8 +55,14 @@ local function UpdateTree(tree)
 	tree.RootNode:Clear()
 	for k, v in pairs(cfg.Categories[selectedOption].Children) do
 		local parent = tree:AddNode(v.Name)
+		if v.Icon then
+			parent.Icon:SetImage(v.Icon)
+		end
 		for key, value in pairs(v.Children) do
 			local node = parent:AddNode(value.Name)
+			if value.Icon then
+				node.Icon:SetImage(value.Icon)
+			end
 		end
 	end
 end
@@ -140,39 +154,3 @@ function GMBuddy.CreateMenu()
 	GMBuddy.Menu.EditMenu = edit_menu
 end
 
-local elements = {
-	["CHudGMod"] = true,
-	["CHudCrosshair"] = true
-}
-
-hook.Add( "HUDShouldDraw", "HideHUD", function( name )
-	if !GMBuddy.bMenu then return end
-	// Disable all GMOD HUD related hooks while in Buddy Menu.
-	if elements[name] then return false end
-end)
-
-hook.Add("HUDPaintBackground", "GMBuddy.MenuPaint", function()
-	if !GMBuddy.bMenu then return end
-	for k, v in pairs(player.GetAll()) do
-		if v == LocalPlayer() then continue end
-		local point = v:GetPos() + v:OBBCenter()
-		local data2D = point:ToScreen()
-
-		draw.SimpleText(v:Name(), "GMB_Info", data2D.x, data2D.y, team.GetColor(v:Team()), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-	end
-
-	for k, v in pairs(ents.GetAll()) do
-		if !v:IsNPC() then continue end
-		local point = v:GetPos() + v:OBBCenter()
-		local data2D = point:ToScreen()
-		draw.RoundedBox(0, data2D.x, data2D.y, 10, 10, color_white)
-	end
-end)
-
-hook.Add("VGUIMousePressed", "GMB.VGUI.Press", function(pnl, mouseCode)
-	if !IsValid(pnl) then return end
-	if !GMBuddy.Menu then return end
-	if (pnl:GetParent() == GMBuddy.Menu.SpawnMenu or pnl:GetParent() == GMBuddy.Menu.EditMenu) and pnl:GetName() == "GMBTree" then
-		pnl:SetSelectedItem(nil)
-	end
-end)
