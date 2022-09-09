@@ -1,4 +1,4 @@
-local cfg = GMBuddy.Config.Menu
+local cfg = GMBuddy.Config
 local selectedOption = "Objects"
 
 concommand.Add("gmb_menu", function(ply, cmd, args)

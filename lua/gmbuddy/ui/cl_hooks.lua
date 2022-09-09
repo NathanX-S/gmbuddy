@@ -1,13 +1,9 @@
-local elements = {
-	["CHudGMod"] = true,
-	["CHudCrosshair"] = true,
-	["CHudWeaponSelection"] = true
-}
+local cfg = GMBuddy.Config
 
 hook.Add( "HUDShouldDraw", "GMBuddy.HideHUD", function( name )
 	if !GMBuddy.bMenu then return end
 	// Disable all GMOD HUD related hooks while in Buddy Menu.
-	if elements[name] then return false end
+	if cfg.HUDElements[name] then return false end
 end)
 
 hook.Add("HUDPaintBackground", "GMBuddy.MenuPaint", function()
@@ -17,7 +13,7 @@ hook.Add("HUDPaintBackground", "GMBuddy.MenuPaint", function()
 		local point = v:GetPos() + v:OBBCenter()
 		local data2D = point:ToScreen()
 
-		draw.SimpleText(v:Name(), "GMB_Info", data2D.x, data2D.y, team.GetColor(v:Team()), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		draw.SimpleText(v:Name(), "GMB_Info", data2D.x, data2D.y, cfg.Colors["PlayerInfo"], TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
 
 	for k, v in pairs(ents.GetAll()) do
@@ -33,15 +29,18 @@ hook.Add("CreateMove", "GMBuddy.CreateMove", function(cmd)
 
 	if GMBuddy.bCam then
 		local a = Angle(GMBuddy.CameraAng.x, GMBuddy.CameraAng.y, GMBuddy.CameraAng.z)
+		local mult = cfg.Cam.MoveMult
+		local fwd = (a:Forward() * mult)
+		local right = (a:Right() * mult)
 		if cmd:GetForwardMove() > 0 then
-			GMBuddy.CameraPos = GMBuddy.CameraPos + (a:Forward() * 10)
+			GMBuddy.CameraPos = GMBuddy.CameraPos + fwd
 		elseif cmd:GetForwardMove() < 0 then
-			GMBuddy.CameraPos = GMBuddy.CameraPos - (a:Forward() * 10)
+			GMBuddy.CameraPos = GMBuddy.CameraPos - fwd
 		end
 		if cmd:GetSideMove() > 0 then
-			GMBuddy.CameraPos = GMBuddy.CameraPos + (a:Right() * 10)
+			GMBuddy.CameraPos = GMBuddy.CameraPos + right
 		elseif cmd:GetSideMove() < 0 then
-			GMBuddy.CameraPos = GMBuddy.CameraPos - (a:Right() * 10)
+			GMBuddy.CameraPos = GMBuddy.CameraPos - right
 		end
 	end
 
@@ -103,19 +102,19 @@ local mouseX, mouseY = ScrW() / 2, ScrH() / 2
 
 function GAMEMODE:ShowSpare1()
 	if GMBuddy.bMenu then return end
-    local jobTable = LocalPlayer():getJobTable()
+	local jobTable = LocalPlayer():getJobTable()
 
-    -- We need to check for the existance of jobTable here, because in very rare edge cases, the player's team isn't set, when the getJobTable-function is called here.
-    if jobTable and jobTable.ShowSpare1 then
-        return jobTable.ShowSpare1(LocalPlayer())
-    end
+	// We need to check for the existance of jobTable here, because in very rare edge cases, the player's team isn't set, when the getJobTable-function is called here.
+	if jobTable and jobTable.ShowSpare1 then
+		return jobTable.ShowSpare1(LocalPlayer())
+	end
 
-    GUIToggled = not GUIToggled
+	GUIToggled = not GUIToggled
 
-    if GUIToggled then
-        gui.SetMousePos(mouseX, mouseY)
-    else
-        mouseX, mouseY = gui.MousePos()
-    end
-    gui.EnableScreenClicker(GUIToggled)
+	if GUIToggled then
+		gui.SetMousePos(mouseX, mouseY)
+	else
+		mouseX, mouseY = gui.MousePos()
+	end
+	gui.EnableScreenClicker(GUIToggled)
 end

@@ -1,8 +1,15 @@
-GMBuddy.Config.Menu = {}
-GMBuddy.Config.Menu.Colors = {}
-GMBuddy.Config.Menu.Colors["Selected"] = Color(204, 204,204,50)
-GMBuddy.Config.Menu.Colors["UnselectedCat"] = Color(255, 255, 255,50)
-GMBuddy.Config.Menu.Categories = {
+GMBuddy.Config.HUDElements = {
+	["CHudGMod"] = true,
+	["CHudCrosshair"] = true,
+	["CHudWeaponSelection"] = true
+}
+GMBuddy.Config.Cam = {}
+GMBuddy.Config.Cam.MoveMult = 10
+GMBuddy.Config.Colors = {}
+GMBuddy.Config.Colors["Selected"] = Color(204, 204,204,50)
+GMBuddy.Config.Colors["UnselectedCat"] = Color(255, 255, 255,50)
+GMBuddy.Config.Colors["Marker"] = Color(127, 255, 0, 150)
+GMBuddy.Config.Categories = {
 	Modules = {
 		Icon = "gmbuddy/box-solid.png",
 		Children = {
@@ -29,5 +36,5 @@ GMBuddy.Config.Menu.Categories = {
 		Children = {}
 	}
 }
-GMBuddy.Config.Colors = {}
 GMBuddy.Config.Colors["Marker"] = Color(127, 255, 0, 150)
+GMBuddy.Config.Colors["PlayerInfo"] = Color(255, 255, 255, 150)
