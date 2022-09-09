@@ -3,6 +3,7 @@ local selectedOption = "Objects"
 
 concommand.Add("gmb_menu", function(ply, cmd, args)
 	GMBuddy.bMenu = !GMBuddy.bMenu
+	GMBuddy.bCam = false
 	net.Start("GMBuddy.MenuToggle")
 	net.WriteBool(GMBuddy.bMenu)
 	net.SendToServer()
