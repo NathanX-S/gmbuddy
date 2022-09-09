@@ -4,11 +4,6 @@ local elements = {
 	["CHudWeaponSelection"] = true
 }
 
-local startAng = 0
-local oldAng, newAng, smoothAng = nil
-local origin_start = 0
-
-
 hook.Add( "HUDShouldDraw", "GMBuddy.HideHUD", function( name )
 	if !GMBuddy.bMenu then return end
 	// Disable all GMOD HUD related hooks while in Buddy Menu.
@@ -36,9 +31,6 @@ end)
 hook.Add("CreateMove", "GMBuddy.CreateMove", function(cmd)
 	if !GMBuddy.bMenu then return end
 	local a = Angle(GMBuddy.CameraAng.x, GMBuddy.CameraAng.y, GMBuddy.CameraAng.z)
-	//a:Normalize()
-	//a.yaw = math.rad(a.yaw)
-	//a.pitch = math.rad(a.pitch)
 	if cmd:GetForwardMove() > 0 then
 		GMBuddy.CameraPos = GMBuddy.CameraPos + (a:Forward() * 10)
 	elseif cmd:GetForwardMove() < 0 then
@@ -59,8 +51,6 @@ end)
 
 hook.Add("InputMouseApply", "GMBuddy.MouseInput", function(cmd, x, y)
 	if !GMBuddy.bMenu then return end
-	//print(x)
-	//print("Y", y)
 	cmd:SetMouseX(0)
 	cmd:SetMouseY(0)
 
