@@ -117,7 +117,7 @@ function GAMEMODE:ShowSpare1()
 		return jobTable.ShowSpare1(LocalPlayer())
 	end
 
-	GUIToggled = not GUIToggled
+	GUIToggled = !GUIToggled
 
 	if GUIToggled then
 		gui.SetMousePos(mouseX, mouseY)
