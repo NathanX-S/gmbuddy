@@ -1,7 +1,10 @@
 GMBuddy.Config.HUDElements = {
 	["CHudGMod"] = true,
 	["CHudCrosshair"] = true,
-	["CHudWeaponSelection"] = true
+	["CHudWeaponSelection"] = true,
+	["CHudAmmo"] = true,
+	["CHudHealth"] = true,
+	["CHudSecondaryAmmo"] = true,
 }
 GMBuddy.Config.Cam = {}
 GMBuddy.Config.Cam.MoveMult = 10

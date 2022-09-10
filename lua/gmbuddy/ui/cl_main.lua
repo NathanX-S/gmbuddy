@@ -2,6 +2,7 @@ local cfg = GMBuddy.Config
 local selectedOption = "Objects"
 
 concommand.Add("gmb_menu", function(ply, cmd, args)
+	ply:SetCanZoom(GMBuddy.bMenu)
 	GMBuddy.bMenu = !GMBuddy.bMenu
 	GMBuddy.bCam = false
 	net.Start("GMBuddy.MenuToggle")
