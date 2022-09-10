@@ -22,7 +22,15 @@ hook.Add("PlayerChangedTeam", "GMBuddy.ChangedTeam", function(ply, old, new)
 	end)
 end)
 
-hook.Add("GMBuddy.ClientReady", "GMBuddy.Base.ClientReady", function(ply)
-	local data = GMBuddy.DB.GetPly(ply)
-	ply:changeTeam(data.Team, false, true)
+hook.Add("PlayerInitialSpawn", "GMBuddy.ClientReady", function(ply)
+	timer.Simple(0, function()
+		ply.bWinFocus = nil
+		ply.nFps = nil
+
+		local data = GMBuddy.DB.GetPly(ply)
+		ply:changeTeam(data.Team, false, true)
+
+		net.Start("GMBuddy.ClientResponse")
+		net.Send(ply)
+	end)
 end)

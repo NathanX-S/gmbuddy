@@ -10,6 +10,6 @@ hook.Add("HUDPaint", "GMBuddy.ContextPaint", function()
 	draw.RoundedBox(0, base_x, base_y, box_w, box_h, bg_color)
 	draw.SimpleText(tostring(tr.Entity), "DermaLarge", base_x + ScrW() * 0.01, base_y + ScrH() * 0.01)
 	if !IsValid(tr.Entity) then return end
-	draw.SimpleText("Health: " .. tostring(tr.Entity:Health()) .. "/" .. tostring(tr.Entity:GetMaxHealth()), 
+	draw.SimpleText("Health: " .. tostring(tr.Entity:Health()) .. "/" .. tostring(tr.Entity:GetMaxHealth()),
 	"DermaLarge", base_x + ScrW() * 0.01, base_y + ScrH() * 0.04)
 end)
