@@ -137,6 +137,12 @@ function SWEP:Think()
 			self.NextMouse3 = CurTime() + 0.01
 			net.Start("GMBuddy.ToggleStealth")
 			net.SendToServer()
+			surface.PlaySound("UI/buttonrollover.wav")
+			if LocalPlayer():GetNWBool("ToolgunStealth", false) then
+				chat.AddText(Color(43, 43, 43), "[GMBuddy]", color_white, " Tool Stealth ", Color(209, 15, 15), "[OFF]")
+			else
+				chat.AddText(Color(43, 43, 43), "[GMBuddy]", color_white, " Tool Stealth ", Color(15, 209, 15), "[ON]")
+			end
 		end
 	end
 
