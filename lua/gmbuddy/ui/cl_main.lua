@@ -1,15 +1,15 @@
 local cfg = GMBuddy.Config
 local selectedOption = "Objects"
 
-concommand.Add("gmb_menu", function(ply, cmd, args)
-	ply:SetCanZoom(GMBuddy.bMenu)
-	GMBuddy.bMenu = !GMBuddy.bMenu
+concommand.Add("gmb_hermes", function(ply, cmd, args)
+	GMBuddy.bHermes = !GMBuddy.bHermes
 	GMBuddy.bCam = false
-	net.Start("GMBuddy.MenuToggle")
-	net.WriteBool(GMBuddy.bMenu)
+	net.Start("GMBuddy.HermesToggle")
+	net.WriteBool(GMBuddy.bHermes)
 	net.SendToServer()
-	gui.EnableScreenClicker(GMBuddy.bMenu)
-	if GMBuddy.bMenu and GMBuddy.CameraPos == Vector(0, 0, 0) then
+	ply:SetCanZoom(GMBuddy.bHermes)
+	gui.EnableScreenClicker(GMBuddy.bHermes)
+	if GMBuddy.bHermes and GMBuddy.CameraPos == Vector(0, 0, 0) then
 		local tr = util.TraceLine({
 			start = LocalPlayer():GetPos(),
 			endpos = LocalPlayer():GetPos() + LocalPlayer():GetAngles():Up() * 100000,
@@ -19,11 +19,11 @@ concommand.Add("gmb_menu", function(ply, cmd, args)
 		GMBuddy.CameraPos.z = math.min(tr.HitPos.z, 1000)
 		GMBuddy.CameraAng = Angle(45, LocalPlayer():EyeAngles().yaw, 0)
 	end
-	if !GMBuddy.Menu then
-		net.Start("GMBuddy.MenuRequest")
+	if !GMBuddy.Hermes then
+		net.Start("GMBuddy.HermesRequest")
 		net.SendToServer()
 	else
-		GMBuddy.Menu:SetVisible(!GMBuddy.Menu:IsVisible())
+		GMBuddy.Hermes:SetVisible(!GMBuddy.Hermes:IsVisible())
 	end
 end)
 
@@ -36,21 +36,12 @@ concommand.Add("gmb_reload", function(ply, cmd, args)
 	GMBuddy.CameraPos = tr.HitPos
 	GMBuddy.CameraPos.z = math.min(tr.HitPos.z, 1000)
 	GMBuddy.CameraAng = Angle(45, LocalPlayer():EyeAngles().yaw, 0)
-	if GMBuddy.Menu then
-		GMBuddy.Menu:Remove()
+	if GMBuddy.Hermes then
+		GMBuddy.Hermes:Remove()
 	end
 	cfg = GMBuddy.Config
-	GMBuddy.CreateMenu()
-	GMBuddy.Menu:SetVisible(!GMBuddy.Menu:IsVisible())
-end)
-
-net.Receive("GMBuddy.MenuResponse", function(len, ply)
-	if !GMBuddy.Menu then
-		GMBuddy.CreateMenu()
-		return
-	end
-	GMBuddy.bMenu = LocalPlayer():GetNWBool("GMBuddy.MenuToggle", false)
-	GMBuddy.Menu:SetVisible(!GMBuddy.Menu:IsVisible())
+	GMBuddy.CreateHermes()
+	GMBuddy.Hermes:SetVisible(!GMBuddy.Hermes:IsVisible())
 end)
 
 local function UpdateTree(tree)
@@ -69,7 +60,7 @@ local function UpdateTree(tree)
 	end
 end
 
-function GMBuddy.CreateMenu()
+function GMBuddy.CreateHermes()
 	local container = vgui.Create("DPanel")
 	container:SetSize(ScrW(), ScrH())
 	container:SetCursor("hand")
@@ -151,8 +142,8 @@ function GMBuddy.CreateMenu()
 		surface.SetDrawColor(0, 0, 0, 255)
 		surface.DrawOutlinedRect(0, 0, w, h, 2)
 	end
-	GMBuddy.Menu = container
-	GMBuddy.Menu.SpawnMenu = spawn_menu
-	GMBuddy.Menu.EditMenu = edit_menu
+	GMBuddy.Hermes = container
+	GMBuddy.Hermes.SpawnMenu = spawn_menu
+	GMBuddy.Hermes.EditMenu = edit_menu
 end
 

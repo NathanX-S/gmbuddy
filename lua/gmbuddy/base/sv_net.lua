@@ -1,8 +1,8 @@
 util.AddNetworkString("GMBuddy.Heartbeat")
 util.AddNetworkString("GMBuddy.ClientResponse")
-util.AddNetworkString("GMBuddy.MenuRequest")
-util.AddNetworkString("GMBuddy.MenuToggle")
-util.AddNetworkString("GMBuddy.MenuResponse")
+util.AddNetworkString("GMBuddy.HermesRequest")
+util.AddNetworkString("GMBuddy.HermesToggle")
+util.AddNetworkString("GMBuddy.HermesResponse")
 
 net.Receive("GMBuddy.Heartbeat", function(len, ply)
 	local focus = net.ReadBool()

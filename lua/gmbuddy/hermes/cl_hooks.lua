@@ -2,13 +2,13 @@ local cfg = GMBuddy.Config
 local move_mult = cfg.Cam.MoveMult
 
 hook.Add( "HUDShouldDraw", "GMBuddy.HideHUD", function( name )
-	if !GMBuddy.bMenu then return end
-	// Disable all GMOD HUD related hooks while in Buddy Menu.
+	if !GMBuddy.bHermes then return end
+	// Disable all GMOD HUD related hooks while in Hermes.
 	if cfg.HUDElements[name] then return false end
 end)
 
-hook.Add("HUDPaintBackground", "GMBuddy.MenuPaint", function()
-	if !GMBuddy.bMenu then return end
+hook.Add("HUDPaintBackground", "GMBuddy.HermesPaint", function()
+	if !GMBuddy.bHermes then return end
 	for k, v in pairs(player.GetAll()) do
 		if v == LocalPlayer() then continue end
 		local point = v:GetPos() + v:OBBCenter()
@@ -26,7 +26,7 @@ hook.Add("HUDPaintBackground", "GMBuddy.MenuPaint", function()
 end)
 
 hook.Add("CreateMove", "GMBuddy.CreateMove", function(cmd)
-	if !GMBuddy.bMenu then return end
+	if !GMBuddy.bHermes then return end
 
 	if GMBuddy.bCam then
 		local a = Angle(GMBuddy.CameraAng.x, GMBuddy.CameraAng.y, GMBuddy.CameraAng.z)
@@ -68,12 +68,12 @@ end)
 
 hook.Add("VGUIMousePressed", "GMBuddy.VGUI.Press", function(pnl, mouseCode)
 	if !IsValid(pnl) then return end
-	if !GMBuddy.Menu then return end
-	if (pnl:GetParent() == GMBuddy.Menu.SpawnMenu or pnl:GetParent() == GMBuddy.Menu.EditMenu) and pnl:GetName() == "GMBTree" then
+	if !GMBuddy.Hermes then return end
+	if (pnl:GetParent() == GMBuddy.Hermes.SpawnMenu or pnl:GetParent() == GMBuddy.Hermes.EditMenu) and pnl:GetName() == "GMBTree" then
 		pnl:SetSelectedItem(nil)
 	end
 
-	if (pnl == GMBuddy.Menu) and (mouseCode == MOUSE_RIGHT) then
+	if (pnl == GMBuddy.Hermes) and (mouseCode == MOUSE_RIGHT) then
 		gui.EnableScreenClicker(false)
 		GMBuddy.bCam = true
 	end
@@ -87,7 +87,7 @@ hook.Add("PlayerButtonUp", "GMBuddy.ButtonUp", function(ply, button)
 end)
 
 hook.Add("CalcView", "GMBuddy.CalcView", function(ply, origin, angles, fov, znear, zfar)
-	if !GMBuddy.bMenu then return end
+	if !GMBuddy.bHermes then return end
 	local view = {
 		origin = GMBuddy.CameraPos,
 		angles = GMBuddy.CameraAng,
@@ -99,7 +99,7 @@ hook.Add("CalcView", "GMBuddy.CalcView", function(ply, origin, angles, fov, znea
 end)
 
 hook.Add("SpawnMenuOpen", "GMBuddy.CancelSpawnMenu", function()
-	if !GMBuddy.bMenu then return end
+	if !GMBuddy.bHermes then return end
 	return false
 end)
 
@@ -109,7 +109,7 @@ local GUIToggled = false
 local mouseX, mouseY = ScrW() / 2, ScrH() / 2
 
 function GAMEMODE:ShowSpare1()
-	if GMBuddy.bMenu then return end
+	if GMBuddy.bHermes then return end
 	local jobTable = LocalPlayer():getJobTable()
 
 	// We need to check for the existance of jobTable here, because in very rare edge cases, the player's team isn't set, when the getJobTable-function is called here.
@@ -128,7 +128,7 @@ function GAMEMODE:ShowSpare1()
 end
 
 function GAMEMODE:ShowSpare2()
-	if GMBuddy.bMenu then return end
+	if GMBuddy.bHermes then return end
 	local jobTable = LocalPlayer():getJobTable()
 
 	// We need to check for the existance of jobTable here, because in very rare edge cases, the player's team isn't set, when the getJobTable-function is called here.

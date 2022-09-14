@@ -1,5 +1,5 @@
 local PANEL = {}
-local cfg = GMBuddy.Config.Menu
+local cfg = GMBuddy.Config
 AccessorFunc( PANEL, "m_pRoot", "Root" )
 
 AccessorFunc( PANEL, "m_pParentNode", "ParentNode" )

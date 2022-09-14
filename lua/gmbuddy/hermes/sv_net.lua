@@ -1,12 +1,12 @@
 
-net.Receive("GMBuddy.MenuRequest", function(len, ply)
+net.Receive("GMBuddy.HermesRequest", function(len, ply)
 	if !(IsValid(ply) and ply:IsPlayer()) then return end
 	if !GMBuddy.PermsCheck(ply) then return end
-	net.Start("GMBuddy.MenuResponse")
+	net.Start("GMBuddy.HermesResponse")
 	net.Send(ply)
 end)
 
-net.Receive("GMBuddy.MenuToggle", function(len, ply)
+net.Receive("GMBuddy.HermesToggle", function(len, ply)
 	if !(IsValid(ply) and ply:IsPlayer()) then return end
 	if !GMBuddy.PermsCheck(ply) then return end
 	local state = net.ReadBool()
@@ -14,7 +14,7 @@ net.Receive("GMBuddy.MenuToggle", function(len, ply)
 		ply:SetAbsVelocity(Vector(0,0,0))
 		ply:ResetSequence("idle")
 	end
-	ply:SetNWBool("GMBuddy.MenuToggle", state)
+	ply:SetNWBool("GMBuddy.HermesToggle", state)
 end)
 
 net.Receive("GMBuddy.ModuleRequest", function(len, ply)

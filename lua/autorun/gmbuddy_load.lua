@@ -82,6 +82,7 @@ end
 
 LoadDir("gmbuddy/base")
 LoadDir("gmbuddy/ui")
+LoadDir("gmbuddy/hermes")
 LoadDir("gmbuddy/tools")
 /*local _, dirs = file.Find("GMBuddy_*", "LUA") // load any GMBuddy related folders
 
