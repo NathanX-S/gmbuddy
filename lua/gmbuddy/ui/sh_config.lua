@@ -1,3 +1,9 @@
+GMBuddy.SLIDER = 1
+GMBuddy.TEXT = 2
+GMBuddy.CHECKBOX = 3
+GMBuddy.LIST = 4
+GMBuddy.RADIO = 5
+
 GMBuddy.Config.HUDElements = {
 	["CHudGMod"] = true,
 	["CHudCrosshair"] = true,
@@ -22,6 +28,29 @@ GMBuddy.Config.Categories = {
 					gmb_explosion = {
 						Name = "Explosion",
 						Icon = "gmbuddy/explosion-solid.png",
+						Options = {
+							delay = {
+								Name = "Delay",
+								Type = GMBuddy.SLIDER,
+								Step = 0.01,
+								Min = 0,
+								Max = 600
+							},
+							dmg = {
+								Name = "Damage",
+								Type = GMBuddy.SLIDER,
+								Step = 1,
+								Min = 0,
+								Max = 1000
+							},
+							radius = {
+								Name = "Radius",
+								Type = GMBuddy.SLIDER,
+								Step = 1,
+								Min = 0,
+								Max = 1000
+							}
+						}
 					}
 				}
 			}

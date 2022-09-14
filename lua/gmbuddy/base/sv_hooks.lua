@@ -1,3 +1,4 @@
+local cfg = GMBuddy.Config
 hook.Add("OnEntityCreated", "GMBuddy.NPCCheck", function(ent)
 	timer.Simple(0, function()
 		if !ent:IsValid() then return end
@@ -33,4 +34,15 @@ hook.Add("PlayerInitialSpawn", "GMBuddy.ClientReady", function(ply)
 		net.Start("GMBuddy.ClientResponse")
 		net.Send(ply)
 	end)
+end)
+
+hook.Add("EntityTakeDamage", "EntityDamageExample", function(target, dmginfo)
+	if ( target:IsPlayer() and dmginfo:IsBulletDamage() ) then
+		print(cfg.Hitgroups[target:LastHitGroup()][1])
+		target:ChatPrint(cfg.Hitgroups[target:LastHitGroup()][1])
+	end
+end)
+
+hook.Add("ScalePlayerDamage", "EntityDamageExScale", function(ply, hitgroup, dmginfo)
+	print("yeah", hitgroup)
 end)
