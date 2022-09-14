@@ -18,6 +18,7 @@ GMBuddy.Config.Colors = {}
 GMBuddy.Config.Colors["Selected"] = Color(204, 204,204,50)
 GMBuddy.Config.Colors["UnselectedCat"] = Color(255, 255, 255,50)
 GMBuddy.Config.Colors["Marker"] = Color(127, 255, 0, 150)
+
 GMBuddy.Config.Categories = {
 	Modules = {
 		Icon = "gmbuddy/box-solid.png",
