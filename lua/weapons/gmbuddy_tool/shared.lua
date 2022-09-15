@@ -44,7 +44,7 @@ function SWEP:InitializeTools()
 
 		temp[k] = table.Copy( v )
 		temp[k].SWEP = self
-		temp[k].Owner = self.Owner
+		temp[k].Owner = self:GetOwner()
 		temp[k].Weapon = self
 		temp[k]:Init()
 
@@ -177,9 +177,9 @@ function SWEP:Think()
 		end
 	end
 
-	self.Primary.Automatic = tool.LeftClickAutomatic || false
-	self.Secondary.Automatic = tool.RightClickAutomatic || false
-	self.RequiresTraceHit = tool.RequiresTraceHit || true
+	self.Primary.Automatic = tool.LeftClickAutomatic or false
+	self.Secondary.Automatic = tool.RightClickAutomatic or false
+	self.RequiresTraceHit = tool.RequiresTraceHit or true
 
 	tool:Think()
 
@@ -194,7 +194,7 @@ function SWEP:DoShootEffect( hitpos, hitnormal, entity, physbone, bFirstTimePred
 
 	-- There's a bug with the model that's causing a muzzle to
 	-- appear on everyone's screen when we fire this animation.
-	self.Owner:SetAnimation( PLAYER_ATTACK1 ) -- 3rd Person Animation
+	self:GetOwner():SetAnimation( PLAYER_ATTACK1 ) -- 3rd Person Animation
 
 	if ( !bFirstTimePredicted ) then return end
 	if ( GetConVarNumber( "gmod_drawtooleffects" ) == 0 ) then return end
@@ -206,9 +206,9 @@ function SWEP:DoShootEffect( hitpos, hitnormal, entity, physbone, bFirstTimePred
 	effectdata:SetAttachment( physbone )
 	util.Effect( "selection_indicator", effectdata )
 
-	local effectdata = EffectData()
+	effectdata = EffectData()
 	effectdata:SetOrigin( hitpos )
-	effectdata:SetStart( self.Owner:GetShootPos() )
+	effectdata:SetStart( self:GetOwner():GetShootPos() )
 	effectdata:SetAttachment( 1 )
 	effectdata:SetEntity( self )
 	util.Effect( "ToolTracer", effectdata )
@@ -218,7 +218,7 @@ end
 -- Trace a line then send the result to a mode function
 function SWEP:PrimaryAttack()
 
-	local tr = util.GetPlayerTrace( self.Owner )
+	local tr = util.GetPlayerTrace( self:GetOwner() )
 	tr.mask = bit.bor( CONTENTS_SOLID, CONTENTS_MOVEABLE, CONTENTS_MONSTER, CONTENTS_WINDOW, CONTENTS_DEBRIS, CONTENTS_GRATE, CONTENTS_AUX )
 	local trace = util.TraceLine( tr )
 	if ( !trace.Hit ) then return end
@@ -233,7 +233,7 @@ function SWEP:PrimaryAttack()
 
 	-- Ask the gamemode if it's ok to do this
 	local mode = self:GetMode()
-	if ( !gamemode.Call( "CanTool", self.Owner, trace, mode, tool, 1 ) ) then return end
+	if ( !gamemode.Call( "CanTool", self:GetOwner(), trace, mode, tool, 1 ) ) then return end
 
 	if ( !tool:LeftClick( trace ) ) then return end
 
@@ -243,7 +243,7 @@ end
 
 function SWEP:SecondaryAttack()
 
-	local tr = util.GetPlayerTrace( self.Owner )
+	local tr = util.GetPlayerTrace( self:GetOwner() )
 	tr.mask = bit.bor( CONTENTS_SOLID, CONTENTS_MOVEABLE, CONTENTS_MONSTER, CONTENTS_WINDOW, CONTENTS_DEBRIS, CONTENTS_GRATE, CONTENTS_AUX )
 	local trace = util.TraceLine( tr )
 	if ( !trace.Hit ) then return end
@@ -258,7 +258,7 @@ function SWEP:SecondaryAttack()
 
 	-- Ask the gamemode if it's ok to do this
 	local mode = self:GetMode()
-	if ( !gamemode.Call( "CanTool", self.Owner, trace, mode, tool, 2 ) ) then return end
+	if ( !gamemode.Call( "CanTool", self:GetOwner(), trace, mode, tool, 2 ) ) then return end
 
 	if ( !tool:RightClick( trace ) ) then return end
 
@@ -269,9 +269,9 @@ end
 function SWEP:Reload()
 
 	-- This makes the reload a semi-automatic thing rather than a continuous thing
-	if ( !self.Owner:KeyPressed( IN_RELOAD ) ) then return end
+	if ( !self:GetOwner():KeyPressed( IN_RELOAD ) ) then return end
 
-	local tr = util.GetPlayerTrace( self.Owner )
+	local tr = util.GetPlayerTrace( self:GetOwner() )
 	tr.mask = bit.bor( CONTENTS_SOLID, CONTENTS_MOVEABLE, CONTENTS_MONSTER, CONTENTS_WINDOW, CONTENTS_DEBRIS, CONTENTS_GRATE, CONTENTS_AUX )
 	local trace = util.TraceLine( tr )
 	if ( !trace.Hit ) then return end
@@ -286,7 +286,7 @@ function SWEP:Reload()
 
 	-- Ask the gamemode if it's ok to do this
 	local mode = self:GetMode()
-	if ( !gamemode.Call( "CanTool", self.Owner, trace, mode, tool, 3 ) ) then return end
+	if ( !gamemode.Call( "CanTool", self:GetOwner(), trace, mode, tool, 3 ) ) then return end
 
 	if ( !tool:Reload( trace ) ) then return end
 
@@ -300,7 +300,7 @@ function SWEP:Holster()
 	if ( !self:GetToolObject() ) then return self.CanHolster end
 
 	local CanHolster = self:GetToolObject():Holster()
-	if ( CanHolster ~= nil ) then return CanHolster end
+	if ( CanHolster != nil ) then return CanHolster end
 
 	return self.CanHolster
 
@@ -334,7 +334,7 @@ function SWEP:Deploy()
 	self:GetToolObject():UpdateData()
 
 	local CanDeploy = self:GetToolObject():Deploy()
-	if ( CanDeploy ~= nil ) then return CanDeploy end
+	if ( CanDeploy != nil ) then return CanDeploy end
 
 	return self.CanDeploy
 

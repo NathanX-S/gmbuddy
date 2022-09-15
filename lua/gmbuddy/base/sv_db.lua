@@ -4,17 +4,17 @@ function GMBuddy.DB.Create()
 end
 
 function GMBuddy.DB.SavePly(ply)
-	print("SAVING", ply:Team())
-	local data = sql.Query("SELECT * FROM gmbuddy_players WHERE SteamID = " .. sql.SQLStr( ply:SteamID() ) .. ";")
+	local sid = sql.SQLStr(ply:SteamID())
+	local data = sql.Query("SELECT * FROM gmbuddy_players WHERE SteamID = " .. sid .. ";")
 	if (data) then
-		sql.Query( "UPDATE gmbuddy_players SET Team = " .. tostring(ply:Team()) .. " WHERE SteamID = " .. sql.SQLStr( ply:SteamID() ) .. ";" )
+		sql.Query("UPDATE gmbuddy_players SET Team = " .. ply:Team() .. " WHERE SteamID = " .. sid .. ";")
 	else
-		sql.Query( "INSERT INTO gmbuddy_players ( SteamID, Team ) VALUES( " .. sql.SQLStr( ply:SteamID() ) .. ", " .. ply:Team() .. " )" )
+		sql.Query("INSERT INTO gmbuddy_players ( SteamID, Team ) VALUES( " .. sid .. ", " .. ply:Team() .. " )")
 	end
 end
 
 function GMBuddy.DB.GetPly(ply)
-	local res = sql.QueryRow("SELECT * FROM gmbuddy_players WHERE SteamID = " .. sql.SQLStr( ply:SteamID() ) .. ";")
+	local res = sql.QueryRow("SELECT * FROM gmbuddy_players WHERE SteamID = " .. sql.SQLStr(ply:SteamID()) .. ";")
 	if not res then
 		GMBuddy.DB.SavePly(ply)
 		res = GMBuddy.DB.GetPly(ply)

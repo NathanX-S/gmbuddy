@@ -139,7 +139,8 @@ function ToolObj:SetObject( i, ent, pos, phys, bone, norm )
 	end
 
 	if ( SERVER ) then
-		-- Todo: Make sure the client got the same info
+		return
+		-- TODO: Make sure the client got the same info
 	end
 
 end
