@@ -19,55 +19,25 @@ GMBuddy.Config.Colors["Selected"] = Color(204, 204,204,50)
 GMBuddy.Config.Colors["UnselectedCat"] = Color(255, 255, 255,50)
 GMBuddy.Config.Colors["Marker"] = Color(127, 255, 0, 150)
 
-GMBuddy.Config.Categories = {
-	Modules = {
-		Icon = "gmbuddy/box-solid.png",
-		Children = {
-			fx = {
-				Name = "Effects",
-				Children = {
-					gmb_explosion = {
-						Name = "Explosion",
-						Icon = "gmbuddy/explosion-solid.png",
-						Options = {
-							delay = {
-								Name = "Delay",
-								Type = GMBuddy.SLIDER,
-								Step = 0.01,
-								Min = 0,
-								Max = 600
-							},
-							dmg = {
-								Name = "Damage",
-								Type = GMBuddy.SLIDER,
-								Step = 1,
-								Min = 0,
-								Max = 1000
-							},
-							radius = {
-								Name = "Radius",
-								Type = GMBuddy.SLIDER,
-								Step = 1,
-								Min = 0,
-								Max = 1000
-							}
-						}
-					}
-				}
-			}
-		},
-		Width = 48
-	},
-	Objects = {
-		Icon = "gmbuddy/person-solid.png",
-		Width = 32,
-		Children = {}
-	},
-	Groups = {
-		Icon = "gmbuddy/people-group-solid.png",
-		Width = 64,
-		Children = {}
-	}
-}
+local cat = GMBuddy.AddCategory("mdls", "Modules", {"gmbuddy/box-solid.png", 48})
+local sub = cat:AddSubcategory("fx", "Effects")
+local child = sub:AddChild("gmb_explosion", "Explosion", "gmbuddy/explosion-solid.png")
+child:AddOption("delay", "Delay",
+	GMBuddy.SLIDER,
+	{Step = 0.01,
+	Min = 0, Max = 600})
+child:AddOption("dmg", "Damage",
+	GMBuddy.SLIDER,
+	{Step = 1,
+	Min = 0, Max = 1000})
+child:AddOption("radius", "Radius",
+	GMBuddy.SLIDER,
+	{Step = 1,
+	Min = 0, Max = 1000})
+
+cat = GMBuddy.AddCategory("objs", "Objects", {"gmbuddy/person-solid.png", 32})
+cat = GMBuddy.AddCategory("groups", "Groups", {"gmbuddy/people-group-solid.png", 64})
+
+PrintTable(GMBuddy.Config.Categories)
 GMBuddy.Config.Colors["Marker"] = Color(127, 255, 0, 150)
 GMBuddy.Config.Colors["PlayerInfo"] = Color(255, 255, 255, 150)

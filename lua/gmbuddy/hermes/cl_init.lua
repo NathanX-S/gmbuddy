@@ -5,7 +5,7 @@ GMBuddy.CameraPos = Vector(0, 0, 0)
 GMBuddy.CameraAng = Angle(0 , 0, 0)
 
 local cfg = GMBuddy.Config
-local selectedOption = "Objects"
+local selectedOption = "objs"
 
 concommand.Add("gmb_hermes", function(ply, cmd, args)
 	GMBuddy.bHermes = !GMBuddy.bHermes
@@ -113,7 +113,7 @@ function GMBuddy.CreateHermes()
 			local oldPaint = btn.Paint
 			function btn:Paint(w, h)
 				oldPaint(self, w, h)
-				draw.DrawText(k, "GMB_UI", v.Width / 2, ScrH() * 0.05, color_white, TEXT_ALIGN_CENTER)
+				draw.DrawText(v.Name, "GMB_UI", v.Width / 2, ScrH() * 0.05, color_white, TEXT_ALIGN_CENTER)
 			end
 			btn:Dock(LEFT)
 			btn:DockMargin(42, 0, 0, 0)

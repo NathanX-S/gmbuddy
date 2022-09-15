@@ -7,6 +7,7 @@ local Module_meta = {
 		return self.Options[key]
 	end
 }
+Module_meta.__index = Module_meta
 
 local Subcategory_meta = {
 	AddChild = function(self, key, name, icon)
@@ -15,6 +16,7 @@ local Subcategory_meta = {
 		return self.Children[key]
 	end
 }
+Subcategory_meta.__index = Subcategory_meta
 
 local Category_meta = {
 	AddSubcategory = function(self, key, name)
