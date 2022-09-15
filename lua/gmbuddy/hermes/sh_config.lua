@@ -38,6 +38,5 @@ child:AddOption("radius", "Radius",
 cat = GMBuddy.AddCategory("objs", "Objects", {"gmbuddy/person-solid.png", 32})
 cat = GMBuddy.AddCategory("groups", "Groups", {"gmbuddy/people-group-solid.png", 64})
 
-PrintTable(GMBuddy.Config.Categories)
 GMBuddy.Config.Colors["Marker"] = Color(127, 255, 0, 150)
 GMBuddy.Config.Colors["PlayerInfo"] = Color(255, 255, 255, 150)
