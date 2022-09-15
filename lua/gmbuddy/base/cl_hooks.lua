@@ -7,12 +7,12 @@ function GMBuddy.ClientThink()
 		net.WriteBool(system.HasFocus()) // Game in focus?
 		net.WriteUInt(fps, 10) // FPS.
 		net.SendToServer()
+		GMBuddy.LastHeartbeat = SysTime() + cfg.HeartbeatPace
 	end
 end
 
 hook.Add("InitPostEntity", "GMBuddy.ClientReady", function()
 	timer.Simple(cfg.HeartbeatDelay, function()
-		GMBuddy.LastHeartbeat = SysTime()
 		hook.Add("Think", "GMBuddy.ClientThink", GMBuddy.ClientThink)
 	end)
 end)

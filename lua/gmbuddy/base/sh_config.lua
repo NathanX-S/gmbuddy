@@ -3,7 +3,7 @@ GMBuddy.Config = {}
 GMBuddy.Config.Categories = {}
 
 GMBuddy.Config.HeartbeatDelay = 10.0
-GMBuddy.Config.HeartbeatPace = 5.0
+GMBuddy.Config.HeartbeatPace = 0.25
 
 GMBuddy.Config.Hitgroups = {
 	[HITGROUP_HEAD] = {"Head"},
