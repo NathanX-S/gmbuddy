@@ -1,5 +1,7 @@
 GMBuddy.Config = {}
 
+GMBuddy.Config.MaxCorpses = 25
+
 GMBuddy.Config.Categories = {}
 
 GMBuddy.Config.HeartbeatDelay = 10.0

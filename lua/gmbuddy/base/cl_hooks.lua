@@ -16,3 +16,19 @@ hook.Add("InitPostEntity", "GMBuddy.ClientReady", function()
 		hook.Add("Think", "GMBuddy.ClientThink", GMBuddy.ClientThink)
 	end)
 end)
+
+hook.Add("EntityRemoved", "GMBuddy.EntRemoved",function(ent)
+	//print( ent:GetRagdollOwner() )
+	if IsValid(ent:GetRagdollOwner()) or ent:IsRagdoll() then
+		table.RemoveByValue(GMBuddy.CorpseStack, ent)
+	end
+	//print(ent:IsRagdoll())
+end)
+
+hook.Add("CreateClientsideRagdoll", "GMBuddy.ClientCorpse", function( entity, ragdoll )
+	if #GMBuddy.CorpseStack == cfg.MaxCorpses then // We need room for more, knock out the first corpse.
+		GMBuddy.CorpseStack[1]:SetSaveValue("m_bFadingOut", true)
+		table.remove(GMBuddy.CorpseStack, 1)
+	end
+	table.insert(GMBuddy.CorpseStack, ragdoll)
+end)
