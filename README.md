@@ -3,3 +3,8 @@
 
 ***
 ### Netmessages
+| Name                | Direction      | Data |   |   |
+|---------------------|----------------|------|---|---|
+| `GMBuddy.Heartbeat` | Client->Server |      |   |   |
+|                     |                |      |   |   |
+|                     |                |      |   |   |
