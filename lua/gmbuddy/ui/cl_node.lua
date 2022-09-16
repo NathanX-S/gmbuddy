@@ -282,7 +282,7 @@ function PANEL:PerformLayout()
 
 	else
 
-		self.Expander:SetPos( 8, 4 )
+		self.Expander:SetPos( 8, 2 )
 		self.Expander:SetSize( 15, 15 )
 		self.Expander:SetVisible( self:HasChildren() || self:GetForceShowExpander() )
 		self.Expander:SetZPos( 10 )

@@ -77,10 +77,10 @@ function GMBuddy.CreateHermes()
 	local spawn_tree = vgui.Create("GMBTree", spawn_menu)
 	local options = {}
 	spawn_tree:Dock(FILL)
-	spawn_tree:SetLineHeight(24)
+	spawn_tree:SetLineHeight(20)
 	local edit_tree = vgui.Create("GMBTree", edit_menu)
 	edit_tree:Dock(FILL)
-	edit_tree:SetLineHeight(24)
+	edit_tree:SetLineHeight(20)
 
 	local pnl = vgui.Create("DPanel", spawn_menu)
 	pnl:Dock(TOP)
