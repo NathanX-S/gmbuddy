@@ -20,8 +20,26 @@ GMBuddy.Config.Colors["UnselectedCat"] = Color(255, 255, 255,50)
 GMBuddy.Config.Colors["Marker"] = Color(127, 255, 0, 150)
 
 local cat = GMBuddy.AddCategory("mdls", "Modules", {"gmbuddy/box-solid.png", 48})
-local sub = cat:AddSubcategory("fx", "Effects")
+local sub = cat:AddSubCategory("fx", "Effects")
 local child = sub:AddChild("gmb_explosion", "Explosion", "gmbuddy/explosion-solid.png")
+child:AddOption("delay", "Delay",
+	GMBuddy.SLIDER,
+	{Step = 0.01,
+	Min = 0, Max = 600}) 
+child:AddOption("dmg", "Damage",
+	GMBuddy.SLIDER,
+	{Step = 1,
+	Min = 0, Max = 1000})
+child:AddOption("radius", "Radius",
+	GMBuddy.SLIDER,
+	{Step = 1,
+	Min = 0, Max = 1000})
+
+cat = GMBuddy.AddCategory("objs", "Objects", {"gmbuddy/person-solid.png", 32})
+sub = cat:AddSubCategory("hl2", "Half-Life 2")
+local test = sub:AddSubCategory("z+a", "Zombies + Aliens")
+print(getmetatable(test)) 
+local child = test:AddChild("hehe", "Explosion", "icon16/brick.png")
 child:AddOption("delay", "Delay",
 	GMBuddy.SLIDER,
 	{Step = 0.01,
@@ -35,7 +53,6 @@ child:AddOption("radius", "Radius",
 	{Step = 1,
 	Min = 0, Max = 1000})
 
-cat = GMBuddy.AddCategory("objs", "Objects", {"gmbuddy/person-solid.png", 32})
 cat = GMBuddy.AddCategory("groups", "Groups", {"gmbuddy/people-group-solid.png", 64})
 
 GMBuddy.Config.Colors["Marker"] = Color(127, 255, 0, 150)

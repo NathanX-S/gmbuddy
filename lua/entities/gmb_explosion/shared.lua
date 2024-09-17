@@ -1,4 +1,4 @@
-ENT.Type = "anim"
+ENT.Type = "point"
 ENT.Base = "gmb_base"
 
 ENT.PrintName = "GMBuddy Explosion"

@@ -1,4 +1,5 @@
 GMBuddy.bHUD = false
+GMBuddy.MatCache = {}
 
 list.Set("DesktopWindows", "GMBuddyIcon", {
 	title = "GMBuddy HUD",

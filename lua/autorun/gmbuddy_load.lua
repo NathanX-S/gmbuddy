@@ -54,38 +54,35 @@ local function LoadDir(dir)
 	print("Loading \"" .. dir .. "\"!")
 
 	for k, v in ipairs(found_files) do
-		local f_split = string.Split(string.StripExtension(v), "_")
-		PrintTable(f_split)
-		if current_files[f_split[2]] == nil then
-			current_files[f_split[2]] = {["sh"] = false, ["sv"] = false, ["cl"] = false}
+		local f_split = string.Split(string.StripExtension(v), "_") 
+		local f_name = f_split[2]
+    		for i = 3, #f_split do
+        	    f_name = f_name .. "_" .. f_split[i]
 		end
-		current_files[f_split[2]][f_split[1]] = true
+		if current_files[f_name] == nil then
+			current_files[f_name] = {["sh"] = false, ["sv"] = false, ["cl"] = false}
+		end
+		current_files[f_name][f_split[1]] = true
 	end
-	PrintTable(current_files)
-	PrintTable(found_files)
 
 	for _, v in ipairs(GMBuddy.FILE_ORDER) do
 		if current_files[v] then
 			LoadFile(dir, v, current_files[v])
 		end
-	end
+ 	end
 
 	for k, v in pairs(current_files) do
 		if k:StartWith("_") then continue end // skip _'d files
 		LoadFile(dir, k, v)
 	end
 
-	for k, v in ipairs(directories) do
+	for k, v in ipairs(directories) do 
 		LoadDir(dir .. "/" .. v)
 	end
 end
+
 
 LoadDir("gmbuddy/base")
 LoadDir("gmbuddy/ui")
 LoadDir("gmbuddy/hermes")
 LoadDir("gmbuddy/tools")
-/*local _, dirs = file.Find("GMBuddy_*", "LUA") // load any GMBuddy related folders
-
-for k, v in pairs(dirs) do
-	LoadDir(v)
-end*/

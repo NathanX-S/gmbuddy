@@ -1,5 +1,5 @@
 local cfg = GMBuddy.Config
-local move_mult = cfg.Cam.MoveMult
+GMBuddy.CamMoveMult = cfg.Cam.MoveMult
 
 hook.Add( "HUDShouldDraw", "GMBuddy.HideHUD", function( name )
 	if !GMBuddy.bHermes then return end
@@ -25,47 +25,6 @@ hook.Add("HUDPaintBackground", "GMBuddy.HermesPaint", function()
 	end
 end)
 
-hook.Add("CreateMove", "GMBuddy.CreateMove", function(cmd)
-	if !GMBuddy.bHermes then return end
-
-	if GMBuddy.bCam then
-		local a = Angle(GMBuddy.CameraAng.x, GMBuddy.CameraAng.y, GMBuddy.CameraAng.z)
-		local fwd = (a:Forward() * move_mult)
-		local right = (a:Right() * move_mult)
-		if cmd:GetForwardMove() > 0 then
-			GMBuddy.CameraPos = GMBuddy.CameraPos + fwd
-		elseif cmd:GetForwardMove() < 0 then
-			GMBuddy.CameraPos = GMBuddy.CameraPos - fwd
-		end
-		if cmd:GetSideMove() > 0 then
-			GMBuddy.CameraPos = GMBuddy.CameraPos + right
-		elseif cmd:GetSideMove() < 0 then
-			GMBuddy.CameraPos = GMBuddy.CameraPos - right
-		end
-	end
-
-	cmd:ClearButtons()
-	cmd:ClearMovement()
-
-	cmd:SetMouseX(0)
-	cmd:SetMouseY(0)
-	return true
-end)
-
-hook.Add("InputMouseApply", "GMBuddy.MouseInput", function(cmd, x, y)
-	if !GMBuddy.bCam then return end
-	cmd:SetMouseX(0)
-	cmd:SetMouseY(0)
-	if cmd:GetMouseWheel() > 0 or cmd:GetMouseWheel() < 0 then
-		move_mult = math.Clamp(move_mult + (cmd:GetMouseWheel() * 0.1), 1, 100)
-	end
-
-	GMBuddy.CameraAng.pitch = math.Clamp(GMBuddy.CameraAng.pitch + (y * 0.01), -90, 90)
-	GMBuddy.CameraAng.yaw = (GMBuddy.CameraAng.yaw - (x * 0.01)) % 360
-
-	return true
-end)
-
 hook.Add("VGUIMousePressed", "GMBuddy.VGUI.Press", function(pnl, mouseCode)
 	if !IsValid(pnl) then return end
 	if !GMBuddy.Hermes then return end
@@ -73,20 +32,55 @@ hook.Add("VGUIMousePressed", "GMBuddy.VGUI.Press", function(pnl, mouseCode)
 		pnl:SetSelectedItem(nil)
 	end
 
-	if (pnl == GMBuddy.Hermes) and (mouseCode == MOUSE_RIGHT) then
+	if (pnl == GMBuddy.Hermes) and (mouseCode == MOUSE_RIGHT) and !GMBuddy.HoveredBtn then
 		gui.EnableScreenClicker(false)
 		GMBuddy.bCam = true
+		--net.Start("GMBuddy.CamToggle")
+		--net.WriteBool(true)
+		--net.SendToServer()
+	end
+
+	if (pnl == GMBuddy.Hermes) and (mouseCode == MOUSE_LEFT) then
+		if GMBuddy.HoveredBtn then
+			GMBuddy.SelectedEnts[GMBuddy.HoveredBtn.ent] = true
+			--GMBuddy.SelectedEnts = {GMBuddy.HoveredBtn.ent}
+		else
+			GMBuddy.SelectedEnts = {}
+		end
 	end
 end)
 
-hook.Add("PlayerButtonUp", "GMBuddy.ButtonUp", function(ply, button)
-	if GMBuddy.bCam and button == MOUSE_RIGHT then
-		gui.EnableScreenClicker(true)
-		GMBuddy.bCam = false
+-- Helper function to get the world space coordinates for an entity's bounding box
+local function GetEntityBoundingBox(entity)
+    local mins, maxs = entity:OBBMins(), entity:OBBMaxs()
+    local pos = entity:GetPos()
+    return pos + mins, pos + maxs
+end
+
+    -- Draw the wireframe box
+hook.Remove("PostDrawOpaqueRenderables", "DrawBoundingBox")
+hook.Add("PostDrawTranslucentRenderables", "DrawBoundingBox", function()
+
+	-- Initialize extreme points
+	local globalMins, globalMaxs = Vector(math.huge, math.huge, math.huge), Vector(-math.huge, -math.huge, -math.huge)
+
+	-- Calculate the global mins and maxs
+	for ent, _ in pairs(GMBuddy.SelectedEnts) do
+		if IsValid(ent) then
+			local mins, maxs = GetEntityBoundingBox(ent)
+			globalMins = Vector(math.min(globalMins.x, mins.x), math.min(globalMins.y, mins.y), math.min(globalMins.z, mins.z))
+			globalMaxs = Vector(math.max(globalMaxs.x, maxs.x), math.max(globalMaxs.y, maxs.y), math.max(globalMaxs.z, maxs.z))
+		end
 	end
+	local center = (globalMins + globalMaxs) / 2
+    local angles = Angle(0, 0, 0)
+	cam.IgnoreZ(true)
+	render.DrawWireframeBox(center, angles, globalMins - center, globalMaxs - center, Color(255, 0, 0), true)
+	cam.IgnoreZ(false)
 end)
 
-hook.Add("CalcView", "GMBuddy.CalcView", function(ply, origin, angles, fov, znear, zfar)
+
+/*hook.Add("CalcView", "GMBuddy.CalcView", function(ply, origin, angles, fov, znear, zfar)
 	if !GMBuddy.bHermes then return end
 	local view = {
 		origin = GMBuddy.CameraPos,
@@ -96,7 +90,7 @@ hook.Add("CalcView", "GMBuddy.CalcView", function(ply, origin, angles, fov, znea
 	}
 
 	return view
-end)
+end)*/
 
 hook.Add("SpawnMenuOpen", "GMBuddy.CancelSpawnMenu", function()
 	if !GMBuddy.bHermes then return end

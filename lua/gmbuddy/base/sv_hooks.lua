@@ -12,7 +12,7 @@ hook.Add("OnEntityCreated", "GMBuddy.NPCCheck", function(ent)
 	end)
 end)
 
-hook.Add("PlayerChangedTeam", "GMBuddy.ChangedTeam", function(ply, old, new)
+hook.Add("PlayerChangedTeam", "GMBuddy.ChangedTeam", function(ply, old, new) 
 	if (old == TEAM_CONNECTING or old == TEAM_UNASSIGNED) then return end
 	timer.Simple(0, function()
 		local res = GMBuddy.DB.GetPly(ply)
@@ -38,11 +38,11 @@ end)
 
 hook.Add("EntityTakeDamage", "EntityDamageExample", function(target, dmginfo)
 	if ( target:IsPlayer() and dmginfo:IsBulletDamage() ) then
-		print(cfg.Hitgroups[target:LastHitGroup()][1])
+		print(target:LastHitGroup())
 		target:ChatPrint(cfg.Hitgroups[target:LastHitGroup()][1])
 	end
 end)
 
 hook.Add("ScalePlayerDamage", "EntityDamageExScale", function(ply, hitgroup, dmginfo)
-	print("yeah", hitgroup)
+	--print("yeah", hitgroup)
 end)

@@ -1,13 +1,20 @@
 local cfg = GMBuddy.Config
-GMBuddy.LastHeartbeat = 0
+GMBuddy.LastHeartbeat = 0 
+GMBuddy.LastFocus = false
+GMBuddy.LastFPS = 0 
 function GMBuddy.ClientThink()
 	if SysTime() > GMBuddy.LastHeartbeat + cfg.HeartbeatPace then
 		local fps = math.Round(1 / RealFrameTime())
+		local diff = (math.abs(fps - GMBuddy.LastFPS))
+		if system.HasFocus() == GMBuddy.LastFocus and (math.abs(fps - GMBuddy.LastFPS)) <= 20 then return end
+		print(diff)
+		GMBuddy.LastFocus = system.HasFocus()
+		GMBuddy.LastFPS = fps
 		net.Start("GMBuddy.Heartbeat")
 		net.WriteBool(system.HasFocus()) // Game in focus?
 		net.WriteUInt(fps, 10) // FPS.
 		net.SendToServer()
-		GMBuddy.LastHeartbeat = SysTime() + cfg.HeartbeatPace
+		GMBuddy.LastHeartbeat = SysTime()
 	end
 end
 

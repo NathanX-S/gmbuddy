@@ -1,80 +1,111 @@
-GMBuddy.Hermes = nil
-GMBuddy.bHermes = false
-GMBuddy.bCam = false
-GMBuddy.CameraPos = Vector(0, 0, 0)
-GMBuddy.CameraAng = Angle(0 , 0, 0)
+
+GMBuddy.Hermes = GMBuddy.Hermes or nil
+GMBuddy.bHermes = GMBuddy.bHermes or false
+GMBuddy.bCam = GMBuddy.bCam or false
+GMBuddy.CameraPos = GMBuddy.CameraPos or Vector(0, 0, 0)
+GMBuddy.CameraAng = GMBuddy.CameraAng or Angle(0, 0, 0)
+GMBuddy.SelectedEnts = GMBuddy.SelectedEnts or {}
+GMBuddy.HoveredBtn = GMBuddy.HoveredBtn or {}
 
 local cfg = GMBuddy.Config
+GMBuddy.CameraMult = cfg.Cam.MoveMult
 local selectedOption = "objs"
 
-concommand.Add("gmb_hermes", function(ply, cmd, args)
-	GMBuddy.bHermes = !GMBuddy.bHermes
-	GMBuddy.bCam = false
-	net.Start("GMBuddy.HermesToggle")
-	net.WriteBool(GMBuddy.bHermes)
-	net.SendToServer()
-	ply:SetCanZoom(GMBuddy.bHermes)
-	gui.EnableScreenClicker(GMBuddy.bHermes)
-	if GMBuddy.bHermes and GMBuddy.CameraPos == Vector(0, 0, 0) then
-		local tr = util.TraceLine({
-			start = LocalPlayer():GetPos(),
-			endpos = LocalPlayer():GetPos() + LocalPlayer():GetAngles():Up() * 100000,
-			mask = MASK_NPCWORLDSTATIC,
-		})
-		GMBuddy.CameraPos = tr.HitPos
-		GMBuddy.CameraPos.z = math.min(tr.HitPos.z, 1000)
-		GMBuddy.CameraAng = Angle(45, LocalPlayer():EyeAngles().yaw, 0)
-	end
-	if !GMBuddy.Hermes then
-		net.Start("GMBuddy.HermesRequest")
-		net.SendToServer()
-	else
-		GMBuddy.Hermes:SetVisible(!GMBuddy.Hermes:IsVisible())
-	end
-end)
 
-concommand.Add("gmb_reload", function(ply, cmd, args)
-	local tr = util.TraceLine({
-		start = LocalPlayer():GetPos(),
-		endpos = LocalPlayer():GetPos() + LocalPlayer():GetAngles():Up() * 100000,
-		mask = MASK_NPCWORLDSTATIC,
-	})
-	GMBuddy.CameraPos = tr.HitPos
-	GMBuddy.CameraPos.z = math.min(tr.HitPos.z, 1000)
-	GMBuddy.CameraAng = Angle(45, LocalPlayer():EyeAngles().yaw, 0)
-	if GMBuddy.Hermes then
-		GMBuddy.Hermes:Remove()
-	end
-	cfg = GMBuddy.Config
-	GMBuddy.CreateHermes()
-	GMBuddy.Hermes:SetVisible(!GMBuddy.Hermes:IsVisible())
-end)
-
-local function UpdateTree(tree)
-	tree.RootNode:Clear()
-	for k, v in pairs(cfg.Categories[selectedOption].Children) do
-		local parent = tree:AddNode(v.Name)
+local function RecurseChildren(parent, parent_node)
+	for k, v in pairs(parent.Children) do
+		local node = parent_node:AddNode(v.Name)
 		if v.Icon then
-			parent.Icon:SetImage(v.Icon)
+			node.Icon:SetMaterial(GMBuddy.LookupUIMat(v.Icon))
 		end
-		for key, value in pairs(v.Children) do
-			local node = parent:AddNode(value.Name)
-			if value.Icon then
-				node.Icon:SetImage(value.Icon)
-			end
-		end
+		RecurseChildren(v, node)
 	end
 end
 
+local function UpdateTree(tree)
+	tree.RootNode:Clear()
+	RecurseChildren(GMBuddy.Categories[selectedOption], tree)
+end
+
+local user_icon = Material("gmbuddy/user-solid.png")
+print("HELP!")
 function GMBuddy.CreateHermes()
-	local container = vgui.Create("DPanel")
-	container:SetSize(ScrW(), ScrH())
-	container:SetCursor("hand")
-	function container:Paint(w, h)
+	print("????")
+	if GMBuddy.Container then
+		GMBuddy.Remove()
 	end
+	local container = vgui.Create("DPanel")
+	GMBuddy.Container = container
+	container:SetSize(ScrW(), ScrH())
+	container:SetCursor("hand")	
+	function container:Paint(w, h)
+		local player_pos = LocalPlayer():GetDrivingEntity():GetPos() -- Get the player's position
+		
+		local hovered = 0
+		local buttons = {}
+		for k, v in ents.Iterator() do
+			-- TODO: SEPERATE LOGIC FROM PAINT
+			if not v:IsNPC() and not v:IsNextBot() then continue end 
+			
+			local ent_pos = v:GetPos()
+			local min, max = v:WorldSpaceAABB()
+			local screen_pos = Vector(ent_pos.x, ent_pos.y, max.z + 10):ToScreen()
+			
+			-- Calculate distance from the player to the entity
+			local distance = player_pos:Distance(ent_pos)
+			
+			-- Adjust icon size based on distance (e.g., icon size decreases as distance increases)
+			local icon_size = math.max(64 / (distance / 100), 32) -- Example scaling factor and minimum size
+			
+			-- Ensure the icon size doesn't become too small
+			if icon_size < 32 then
+				icon_size = 32
+			end
+			
+			-- Draw the icon centered at the entity's screen position
+			local half_size = icon_size / 2
+			local scrW, scrH = ScrW(), ScrH()
+			if (screen_pos.x - half_size) > scrW or (screen_pos.y - half_size) > scrH then continue end
+			if (screen_pos.x - half_size) < 0 or (screen_pos.y - half_size) < 0 then continue end
+			local index = table.insert(buttons, {["icon_size"] = icon_size, ["screen_pos"] = screen_pos, ["ent"] = v})
+			surface.SetDrawColor(255, 255, 255, 255) -- Set the drawing color
+			surface.SetMaterial(user_icon) -- Use our cached material
+			local mouseX, mouseY = gui.MouseX(), gui.MouseY()
+			if mouseX > (screen_pos.x - half_size) and mouseX < (screen_pos.x - half_size) + icon_size then
+				if mouseY > (screen_pos.y - half_size) and mouseY < (screen_pos.y - half_size) + icon_size then
+					hovered = index
+				end
+			end
+		end
+		if hovered == 0 then GMBuddy.HoveredBtn = nil end
+
+		for k, v in ipairs(buttons) do
+			local icon_size = v.icon_size
+			if k == hovered then
+				surface.SetDrawColor(177, 177, 255, 175)
+				if input.IsMouseDown(MOUSE_LEFT) then
+					icon_size = icon_size * 0.9
+				end
+				GMBuddy.HoveredBtn = v
+				print("hovering", v.ent)
+			else
+				surface.SetDrawColor(222, 222, 222, 102)
+			end
+			local half_size = icon_size / 2
+			local screen_pos = v.screen_pos
+			surface.DrawRect(screen_pos.x - half_size, screen_pos.y - half_size, icon_size, icon_size) -- Actually draw the rectangle
+			surface.SetDrawColor( 0, 0, 0, 255 ) -- Set the drawing color
+			surface.SetMaterial( GMBuddy.LookupUIMat("gmbuddy/biohazard-solid.png") ) -- Use our cached material
+			surface.DrawTexturedRect((screen_pos.x - half_size) + 4, (screen_pos.y - half_size) + 4, (icon_size) - 8, icon_size - 8) -- Actually draw the rectangle
+			surface.SetDrawColor(70, 70, 70, 255)
+			surface.DrawOutlinedRect((screen_pos.x - half_size) - 1, (screen_pos.y - half_size) - 1, icon_size + 1, icon_size + 1, 2)
+		end
+	end
+	local header = vgui.Create("DPanel", container)
 	local spawn_menu = vgui.Create("DPanel", container)
 	local edit_menu = vgui.Create("DPanel", container)
 	local spawn_tree = vgui.Create("GMBTree", spawn_menu)
+	header:Dock(TOP)
 	local options = {}
 	spawn_tree:Dock(FILL)
 	spawn_tree:SetLineHeight(20)
@@ -90,13 +121,13 @@ function GMBuddy.CreateHermes()
 
 	timer.Simple(0, function()
 		local fullWidth = pnl:GetWide()
-		for k, v in pairs(cfg.Categories) do
+		for k, v in pairs(GMBuddy.Categories) do
 			local btn = vgui.Create( "DImageButton", pnl )
 			fullWidth = fullWidth - v.Width
 			btn:SetStretchToFit(true)
 			btn:SetKeepAspect(false)
 			btn:SetSize(v.Width, 64)
-			btn:SetImage(v.Icon)
+			btn:SetMaterial(GMBuddy.LookupUIMat(v.Icon))
 			if k ~= selectedOption then
 				btn.m_Image:SetImageColor(cfg.Colors["UnselectedCat"])
 			else
@@ -122,6 +153,12 @@ function GMBuddy.CreateHermes()
 		end
 	end)
 
+	function header:Paint(w, h)
+		surface.SetDrawColor(0, 0, 0, 200)
+		surface.DrawRect(0, 0, 	w, h)
+		surface.SetDrawColor(0, 0, 0, 255)
+		surface.DrawOutlinedRect(0, 0, w, h, 2)
+	end
 	function pnl:Paint(w, h)
 	end
 	function spawn_tree:Paint(w, h)
@@ -129,17 +166,17 @@ function GMBuddy.CreateHermes()
 	function edit_tree:Paint(w, h)
 	end
 
-	spawn_menu:SetSize(ScrW() * 0.175, ScrH() * 0.98)
+	spawn_menu:SetSize(ScrW() * 0.175, ScrH() * 0.95)
 	spawn_menu:SetX(ScrW() * 0.8125)
 	spawn_menu:CenterVertical()
 	function spawn_menu:Paint(w, h)
 		surface.SetDrawColor(0, 0, 0, 200)
 		surface.DrawRect(0, 0, w, h)
 		surface.SetDrawColor(0, 0, 0, 255)
-		surface.DrawRect(0, ScrH() * 0.075, w, 2)
+		surface.DrawRect(0, h * 0.08, w, 2)
 		surface.DrawOutlinedRect(0, 0, w, h, 2)
 	end
-	edit_menu:SetSize(ScrW() * 0.175, ScrH() * 0.98)
+	edit_menu:SetSize(ScrW() * 0.175, ScrH() * 0.95)
 	edit_menu:SetX(ScrW() * 0.0125)
 	edit_menu:CenterVertical()
 	function edit_menu:Paint(w, h)
@@ -153,3 +190,29 @@ function GMBuddy.CreateHermes()
 	GMBuddy.Hermes.EditMenu = edit_menu
 end
 
+
+
+concommand.Add("gmb_ui_reload", function(ply, cmd, args)
+	/*local tr = util.TraceLine({
+		start = ply:GetPos(),
+		endpos = ply:GetPos() + ply:GetAngles():Up() * 100000,
+		mask = MASK_NPCWORLDSTATIC,
+	})
+	local camera_pos = tr.HitPos
+	camera_pos.z = math.min(tr.HitPos.z, 1000)
+	local camera_ang = Angle(45, ply:EyeAngles().yaw, 0)
+	if CLIENT then
+		GMBuddy.CameraPos = camera_pos
+		GMBuddy.CameraAng = camera_ang
+	else
+		ply.CameraPos = camera_pos
+		ply.CameraAng = camera_ang
+	end*/
+	if GMBuddy.Hermes then
+		GMBuddy.Hermes:Remove()
+	end
+	cfg = GMBuddy.Config
+	--local viscon = 
+	GMBuddy.CreateHermes()
+	GMBuddy.Hermes:SetVisible(GMBuddy.bHermes)
+end)

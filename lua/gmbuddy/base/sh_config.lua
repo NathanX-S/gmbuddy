@@ -2,12 +2,11 @@ GMBuddy.Config = {}
 
 GMBuddy.Config.MaxCorpses = 25
 
-GMBuddy.Config.Categories = {}
-
 GMBuddy.Config.HeartbeatDelay = 10.0
-GMBuddy.Config.HeartbeatPace = 0.25
+GMBuddy.Config.HeartbeatPace = 0.78
 
 GMBuddy.Config.Hitgroups = {
+	[HITGROUP_GENERIC] = {"Generic"},
 	[HITGROUP_HEAD] = {"Head"},
 	[HITGROUP_CHEST] = {"Chest"},
 	[HITGROUP_STOMACH] = {"Stomach"},
