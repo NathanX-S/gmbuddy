@@ -18,6 +18,7 @@ GMBuddy.Config.Colors = {}
 GMBuddy.Config.Colors["Selected"] = Color(204, 204,204,50)
 GMBuddy.Config.Colors["UnselectedCat"] = Color(255, 255, 255,50)
 GMBuddy.Config.Colors["Marker"] = Color(127, 255, 0, 150)
+GMBuddy.Config.Colors["WorldSelection"] = Color(255,0,0,255)
 
 local cat = GMBuddy.AddCategory("mdls", "Modules", {"gmbuddy/box-solid.png", 48})
 local sub = cat:AddSubCategory("fx", "Effects")

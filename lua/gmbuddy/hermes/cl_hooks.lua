@@ -1,5 +1,6 @@
 local cfg = GMBuddy.Config
 GMBuddy.CamMoveMult = cfg.Cam.MoveMult
+GMBuddy.LastClick = {}
 
 hook.Add( "HUDShouldDraw", "GMBuddy.HideHUD", function( name )
 	if !GMBuddy.bHermes then return end
@@ -32,22 +33,7 @@ hook.Add("VGUIMousePressed", "GMBuddy.VGUI.Press", function(pnl, mouseCode)
 		pnl:SetSelectedItem(nil)
 	end
 
-	if (pnl == GMBuddy.Hermes) and (mouseCode == MOUSE_RIGHT) and !GMBuddy.HoveredBtn then
-		gui.EnableScreenClicker(false)
-		GMBuddy.bCam = true
-		--net.Start("GMBuddy.CamToggle")
-		--net.WriteBool(true)
-		--net.SendToServer()
-	end
-
-	if (pnl == GMBuddy.Hermes) and (mouseCode == MOUSE_LEFT) then
-		if GMBuddy.HoveredBtn then
-			GMBuddy.SelectedEnts[GMBuddy.HoveredBtn.ent] = true
-			--GMBuddy.SelectedEnts = {GMBuddy.HoveredBtn.ent}
-		else
-			GMBuddy.SelectedEnts = {}
-		end
-	end
+	if (pnl != GMBuddy.Hermes) then return end
 end)
 
 -- Helper function to get the world space coordinates for an entity's bounding box
@@ -57,8 +43,7 @@ local function GetEntityBoundingBox(entity)
     return pos + mins, pos + maxs
 end
 
-    -- Draw the wireframe box
-hook.Remove("PostDrawOpaqueRenderables", "DrawBoundingBox")
+-- Draw the wireframe box
 hook.Add("PostDrawTranslucentRenderables", "DrawBoundingBox", function()
 
 	-- Initialize extreme points
@@ -73,9 +58,9 @@ hook.Add("PostDrawTranslucentRenderables", "DrawBoundingBox", function()
 		end
 	end
 	local center = (globalMins + globalMaxs) / 2
-    local angles = Angle(0, 0, 0)
+    local angles = angle_zero
 	cam.IgnoreZ(true)
-	render.DrawWireframeBox(center, angles, globalMins - center, globalMaxs - center, Color(255, 0, 0), true)
+	render.DrawWireframeBox(center, angles, globalMins - center, globalMaxs - center, cfg.Colors["WorldSelection"], true)
 	cam.IgnoreZ(false)
 end)
 

@@ -30,16 +30,53 @@ end
 local user_icon = Material("gmbuddy/user-solid.png")
 print("HELP!")
 function GMBuddy.CreateHermes()
+	cfg = GMBuddy.Config
 	print("????")
 	if GMBuddy.Container then
-		GMBuddy.Remove()
+		GMBuddy.Container:Remove()
 	end
 	local container = vgui.Create("DPanel")
 	GMBuddy.Container = container
 	container:SetSize(ScrW(), ScrH())
 	container:SetCursor("hand")	
+	function container:OnMousePressed(mouseCode)
+		print("aaaa")
+		GMBuddy.LastClick = {}
+
+		local drive_ent = LocalPlayer():GetDrivingEntity()
+		if !IsValid(drive_ent) then return end
+		local player_pos = drive_ent:GetPos() -- Get the player's position
+		
+		if (mouseCode == MOUSE_RIGHT) and !GMBuddy.HoveredBtn then
+			gui.EnableScreenClicker(false)
+			GMBuddy.bCam = true
+			--net.Start("GMBuddy.CamToggle")
+			--net.WriteBool(true)
+			--net.SendToServer()
+		end
+
+		if (mouseCode == MOUSE_LEFT) then
+			if GMBuddy.HoveredBtn then
+				GMBuddy.SelectedEnts[GMBuddy.HoveredBtn.ent] = true
+				--GMBuddy.SelectedEnts = {GMBuddy.HoveredBtn.ent}
+			else
+				GMBuddy.SelectedEnts = {}
+				local tr = util.TraceLine( {
+					start = player_pos,
+					endpos = player_pos + drive_ent:GetAngles():Forward() + gui.ScreenToVector(gui.MousePos()) * 10000,
+				} )
+				print("yo?", player_pos, tr.HitPos)
+				debugoverlay.Line( player_pos, tr.HitPos, 1, color_white, true )
+				
+				GMBuddy.LastClick = {ThreeD = tr.HitPos, TwoD = {x = gui.MouseX(), y = gui.MouseY()}}
+			end
+		end
+	end
 	function container:Paint(w, h)
-		local player_pos = LocalPlayer():GetDrivingEntity():GetPos() -- Get the player's position
+		if !IsValid(LocalPlayer()) then return end
+		local drive_ent = LocalPlayer():GetDrivingEntity()
+		if !IsValid(drive_ent) then return end
+		local player_pos = drive_ent:GetPos() -- Get the player's position
 		
 		local hovered = 0
 		local buttons = {}
@@ -55,7 +92,7 @@ function GMBuddy.CreateHermes()
 			local distance = player_pos:Distance(ent_pos)
 			
 			-- Adjust icon size based on distance (e.g., icon size decreases as distance increases)
-			local icon_size = math.max(64 / (distance / 100), 32) -- Example scaling factor and minimum size
+			local icon_size = math.max(48 / (distance / 100), 32) -- Example scaling factor and minimum size
 			
 			-- Ensure the icon size doesn't become too small
 			if icon_size < 32 then
@@ -100,6 +137,29 @@ function GMBuddy.CreateHermes()
 			surface.SetDrawColor(70, 70, 70, 255)
 			surface.DrawOutlinedRect((screen_pos.x - half_size) - 1, (screen_pos.y - half_size) - 1, icon_size + 1, icon_size + 1, 2)
 		end
+
+		
+		if !GMBuddy.LastClick.TwoD then return end
+		local click = GMBuddy.LastClick.TwoD
+		local col 
+		surface.SetDrawColor(cfg.Colors["WorldSelection"]) -- Set the drawing color
+		local drive_ent = LocalPlayer():GetDrivingEntity()
+		local player_pos = drive_ent:GetPos() -- Get the player's position
+		local tr = util.TraceLine( {
+			start = player_pos,
+			endpos = player_pos + drive_ent:GetAngles():Forward()
+				+ gui.ScreenToVector(gui.MousePos()) * 10000, 
+		} )
+		print("yo?", player_pos, tr.HitPos)
+		print("hello??", click)
+		PrintTable(click)
+		local cur_x, cur_y = gui.MouseX(), gui.MouseY()
+		local left = math.min(click.x, cur_x)
+		local top = math.min(click.y, cur_y)
+		local width = math.abs(cur_x - click.x)
+		local height = math.abs(cur_y - click.y)
+		
+		surface.DrawOutlinedRect(left, top, width, height, 2)
 	end
 	local header = vgui.Create("DPanel", container)
 	local spawn_menu = vgui.Create("DPanel", container)
@@ -126,7 +186,7 @@ function GMBuddy.CreateHermes()
 			fullWidth = fullWidth - v.Width
 			btn:SetStretchToFit(true)
 			btn:SetKeepAspect(false)
-			btn:SetSize(v.Width, 64)
+			btn:SetSize(v.Width, 48)
 			btn:SetMaterial(GMBuddy.LookupUIMat(v.Icon))
 			if k ~= selectedOption then
 				btn.m_Image:SetImageColor(cfg.Colors["UnselectedCat"])
@@ -210,6 +270,7 @@ concommand.Add("gmb_ui_reload", function(ply, cmd, args)
 	end*/
 	if GMBuddy.Hermes then
 		GMBuddy.Hermes:Remove()
+		GMBuddy.Container:Remove()
 	end
 	cfg = GMBuddy.Config
 	--local viscon = 

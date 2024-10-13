@@ -73,5 +73,5 @@ hook.Add("Tick", "GMBuddy.Hermes.Tick", function()
 	end
 end)
 
-function GM:PlayerDriveAnimate( ply )
+function GAMEMODE:PlayerDriveAnimate( ply )
 end

@@ -1,4 +1,4 @@
-GMBuddy.Config = {}
+GMBuddy.Config = GMBuddy.Config or {}
 
 GMBuddy.Config.MaxCorpses = 25
 
