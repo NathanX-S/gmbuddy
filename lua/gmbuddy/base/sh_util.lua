@@ -74,3 +74,7 @@ end
 function GMBuddy.PermsCheck(ply)
 	return ply:GetUserGroup() == "superadmin"
 end
+
+function GMBuddy.IsValid(ent)
+	return v:IsNPC() or v:IsNextBot()
+end

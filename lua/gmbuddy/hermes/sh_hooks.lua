@@ -74,7 +74,7 @@ hook.Remove("InputMouseApply", "GMBuddy.MouseInput")
 
 
 hook.Add("PlayerButtonUp", "GMBuddy.ButtonUp", function(ply, button)
-	if (ply.bCam or GMBuddy.bCam) and button == MOUSE_RIGHT then
+	if (ply.bCam or GMBuddy.bCam) and button == MOUSE_MIDDLE then
 		ply.bCam = false
 		if CLIENT then
   		    gui.EnableScreenClicker(true)

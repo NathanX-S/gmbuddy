@@ -40,14 +40,14 @@ function GMBuddy.CreateHermes()
 	container:SetSize(ScrW(), ScrH())
 	container:SetCursor("hand")	
 	function container:OnMousePressed(mouseCode)
-		print("aaaa")
+		print("aaaa", mouseCode, "DASDISAN")
 		GMBuddy.LastClick = {}
 
 		local drive_ent = LocalPlayer():GetDrivingEntity()
 		if !IsValid(drive_ent) then return end
 		local player_pos = drive_ent:GetPos() -- Get the player's position
 		
-		if (mouseCode == MOUSE_RIGHT) and !GMBuddy.HoveredBtn then
+		if (mouseCode == MOUSE_MIDDLE) and !GMBuddy.HoveredBtn then
 			gui.EnableScreenClicker(false)
 			GMBuddy.bCam = true
 			--net.Start("GMBuddy.CamToggle")
@@ -65,13 +65,18 @@ function GMBuddy.CreateHermes()
 					start = player_pos,
 					endpos = player_pos + drive_ent:GetAngles():Forward() + gui.ScreenToVector(gui.MousePos()) * 10000,
 				} )
-				print("yo?", player_pos, tr.HitPos)
-				debugoverlay.Line( player_pos, tr.HitPos, 1, color_white, true )
+				--print("yoaaa?", player_pos, tr.HitPos)
+				--debugoverlay.Line( player_pos, tr.HitPos, 5, color_white, true )
 				
 				GMBuddy.LastClick = {ThreeD = tr.HitPos, TwoD = {x = gui.MouseX(), y = gui.MouseY()}}
 			end
 		end
 	end
+
+	function container:OnMouseReleased(mouseCode)
+		GMBuddy.LastClick = {}
+	end
+	
 	function container:Paint(w, h)
 		if !IsValid(LocalPlayer()) then return end
 		local drive_ent = LocalPlayer():GetDrivingEntity()
@@ -82,7 +87,7 @@ function GMBuddy.CreateHermes()
 		local buttons = {}
 		for k, v in ents.Iterator() do
 			-- TODO: SEPERATE LOGIC FROM PAINT
-			if not v:IsNPC() and not v:IsNextBot() then continue end 
+			if not GMBuddy.IsValid(v) then continue end 
 			
 			local ent_pos = v:GetPos()
 			local min, max = v:WorldSpaceAABB()
@@ -145,11 +150,7 @@ function GMBuddy.CreateHermes()
 		surface.SetDrawColor(cfg.Colors["WorldSelection"]) -- Set the drawing color
 		local drive_ent = LocalPlayer():GetDrivingEntity()
 		local player_pos = drive_ent:GetPos() -- Get the player's position
-		local tr = util.TraceLine( {
-			start = player_pos,
-			endpos = player_pos + drive_ent:GetAngles():Forward()
-				+ gui.ScreenToVector(gui.MousePos()) * 10000, 
-		} )
+		--debugoverlay.Line( player_pos, tr.HitPos, 5, Color(0, 255, 0), true )
 		print("yo?", player_pos, tr.HitPos)
 		print("hello??", click)
 		PrintTable(click)
@@ -160,6 +161,16 @@ function GMBuddy.CreateHermes()
 		local height = math.abs(cur_y - click.y)
 		
 		surface.DrawOutlinedRect(left, top, width, height, 2)
+	end
+
+	function container:Think()
+		if !GMBuddy.LastClick.TwoD then return end
+		local boxMin = vector_zero
+		local boxMax = vector_zero
+	
+		-- Calculate box center
+		--local boxCenter = (boxMin + boxMax) / 2
+		--GMBuddy.FindInBoxRotated
 	end
 	local header = vgui.Create("DPanel", container)
 	local spawn_menu = vgui.Create("DPanel", container)
