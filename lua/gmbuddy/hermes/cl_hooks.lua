@@ -45,7 +45,7 @@ end
 
 -- Draw the wireframe box
 hook.Add("PostDrawTranslucentRenderables", "DrawBoundingBox", function()
-
+	if !GMBuddy.bHermes then return end
 	-- Initialize extreme points
 	local globalMins, globalMaxs = Vector(math.huge, math.huge, math.huge), Vector(-math.huge, -math.huge, -math.huge)
 
@@ -62,6 +62,15 @@ hook.Add("PostDrawTranslucentRenderables", "DrawBoundingBox", function()
 	cam.IgnoreZ(true)
 	render.DrawWireframeBox(center, angles, globalMins - center, globalMaxs - center, cfg.Colors["WorldSelection"], true)
 	cam.IgnoreZ(false)
+
+	for ent, _ in pairs(GMBuddy.NavigatingEnts) do
+		if IsValid(ent) then
+			render.DrawLine(ent:GetPos(), ent.NavigateTarget, color_white, false)
+		end
+	end
+
+
+
 end)
 
 

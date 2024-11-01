@@ -22,8 +22,8 @@ drive.Register("drive_hermes",
         -- Set up a speed, go faster if shift is held down
         --
         local speed = 0.01
-        if mv:KeyDown(IN_SPEED) then 
-            speed = 0.05 
+        if mv:KeyDown(IN_SPEED) then
+            speed = 0.05
         end
 
         --
@@ -46,15 +46,21 @@ drive.Register("drive_hermes",
         local maxVelocity = 1000 -- Set your desired max velocity here
         local maxVelocitySqr = maxVelocity * maxVelocity -- Compute squared max velocity
 
-        if vel:LengthSqr() > maxVelocitySqr then
+        local maxVelocityFast = 2000 -- Set your desired max velocity here
+        local maxVelocitySqrFast = maxVelocityFast * maxVelocityFast -- Compute squared max velocity
+
+        if vel:LengthSqr() > maxVelocitySqr and !mv:KeyDown(IN_SPEED) then
             vel = vel:GetNormalized() * maxVelocity
+        elseif vel:LengthSqr() > maxVelocitySqrFast and mv:KeyDown(IN_SPEED) then
+            vel = vel:GetNormalized() * maxVelocityFast
         end
+
 
         --
         -- Apply gradual deceleration if no keys are pressed
         --
         if math.abs(mv:GetForwardSpeed()) + math.abs(mv:GetSideSpeed()) + math.abs(mv:GetUpSpeed()) < 0.1 then
-            local deceleration = 0.75
+            local deceleration = 0.25
             vel = vel * (1 - deceleration)
             if vel:LengthSqr() < 0.01 then
                 vel = vector_origin

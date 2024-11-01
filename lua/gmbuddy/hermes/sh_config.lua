@@ -31,7 +31,7 @@ child:AddOption("dmg", "Damage",
 	GMBuddy.SLIDER,
 	{Step = 1,
 	Min = 0, Max = 1000})
-child:AddOption("radius", "Radius",
+child:AddOption("radius", "Radius", 
 	GMBuddy.SLIDER,
 	{Step = 1,
 	Min = 0, Max = 1000})
@@ -40,7 +40,7 @@ cat = GMBuddy.AddCategory("objs", "Objects", {"gmbuddy/person-solid.png", 32})
 sub = cat:AddSubCategory("hl2", "Half-Life 2")
 local test = sub:AddSubCategory("z+a", "Zombies + Aliens")
 print(getmetatable(test)) 
-local child = test:AddChild("hehe", "Explosion", "icon16/brick.png")
+local child = test:AddChild("npc_zombie", "Slow Zombie", "gmbuddy/biohazard-solid.png")
 child:AddOption("delay", "Delay",
 	GMBuddy.SLIDER,
 	{Step = 0.01,

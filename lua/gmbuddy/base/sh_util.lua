@@ -1,6 +1,9 @@
 GMBuddy.Items = GMBuddy.Items or {}
 GMBuddy.Categories = GMBuddy.Categories or {}
 local Item_meta = {
+	IsItem = function(self)
+		return true
+	end,
 	AddOption = function(self, key, name, _type, extra)
 		self.Options[key] = {["Key"] = key, ["Name"] = name, ["Type"] = _type, ["Parent"] = self, Children = {}}
 		for k, v in pairs(extra) do
@@ -15,6 +18,9 @@ local Item_meta = {
 Item_meta.__index = Item_meta
 
 local Supersubcategory_meta = {
+	IsItem = function(self)
+		return false
+	end,
 	AddChild = function(self, key, name, icon)
 		self.Children[key] = {["Key"] = key, ["Name"] = name, ["Icon"] = icon, ["Parent"] = self, Options = {}, Children = {}}
 		setmetatable(self.Children[key], Item_meta)
@@ -34,6 +40,9 @@ local Supersubcategory_meta = {
 Supersubcategory_meta.__index = Supersubcategory_meta
 
 local Subcategory_meta = {
+	IsItem = function(self)
+		return false
+	end,
 	AddChild = function(self, key, name, icon)
 		self.Children[key] = {["Key"] = key, ["Name"] = name, ["Icon"] = icon, ["Parent"] = self, Options = {}, Children = {}}
 		setmetatable(self.Children[key], Item_meta)
@@ -53,6 +62,9 @@ local Subcategory_meta = {
 Subcategory_meta.__index = Subcategory_meta
 
 local Category_meta = {
+	IsItem = function(self)
+		return false
+	end,
 	AddSubCategory = function(self, key, name)
 		self.Children[key] = {["Key"] = key, ["Name"] = name, ["Parent"] = self, Children = {}}
 
@@ -76,5 +88,6 @@ function GMBuddy.PermsCheck(ply)
 end
 
 function GMBuddy.IsValid(ent)
-	return v:IsNPC() or v:IsNextBot()
+	if !IsValid(ent) then return false end
+	return ent:IsNPC() or ent:IsNextBot() or ent:IsPlayer()
 end

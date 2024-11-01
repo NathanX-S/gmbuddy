@@ -89,7 +89,9 @@ function PANEL:OnNodeSelected( node )
 	if ( IsValid( parent ) && parent.OnNodeSelected ) then
 		parent:OnNodeSelected( node )
 	end
-
+	print("OnNodeSelected", node)
+	print(GMBuddy.Container.modifier_pnl)
+	GMBuddy.Container.modifier_pnl:Clear()
 end
 
 function PANEL:OnNodeAdded( node )
@@ -104,6 +106,9 @@ function PANEL:InternalDoRightClick()
 end
 
 function PANEL:DoClick()
+	print("Node", "DoClick")
+	PrintTable(self.Data)
+	PrintTable(getmetatable(self.Data))
 	return false
 end
 

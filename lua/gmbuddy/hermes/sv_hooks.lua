@@ -73,5 +73,9 @@ hook.Add("Tick", "GMBuddy.Hermes.Tick", function()
 	end
 end)
 
+hook.Add("PlayerDisconnected", "GMBuddy.Hermes.Disconnect", function(ply)
+	table.RemoveByValue(GMBuddy.HermesUsers, ply)
+end)
+
 function GAMEMODE:PlayerDriveAnimate( ply )
 end

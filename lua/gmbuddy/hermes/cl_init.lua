@@ -5,6 +5,7 @@ GMBuddy.bCam = GMBuddy.bCam or false
 GMBuddy.CameraPos = GMBuddy.CameraPos or Vector(0, 0, 0)
 GMBuddy.CameraAng = GMBuddy.CameraAng or Angle(0, 0, 0)
 GMBuddy.SelectedEnts = GMBuddy.SelectedEnts or {}
+GMBuddy.NavigatingEnts = GMBuddy.NavigatingEnts or {}
 GMBuddy.HoveredBtn = GMBuddy.HoveredBtn or {}
 
 local cfg = GMBuddy.Config
@@ -13,6 +14,7 @@ local selectedOption = "objs"
 
 
 local function RecurseChildren(parent, parent_node)
+	parent_node.Data = parent
 	for k, v in pairs(parent.Children) do
 		local node = parent_node:AddNode(v.Name)
 		if v.Icon then
@@ -28,10 +30,8 @@ local function UpdateTree(tree)
 end
 
 local user_icon = Material("gmbuddy/user-solid.png")
-print("HELP!")
 function GMBuddy.CreateHermes()
 	cfg = GMBuddy.Config
-	print("????")
 	if GMBuddy.Container then
 		GMBuddy.Container:Remove()
 	end
@@ -40,25 +40,21 @@ function GMBuddy.CreateHermes()
 	container:SetSize(ScrW(), ScrH())
 	container:SetCursor("hand")	
 	function container:OnMousePressed(mouseCode)
-		print("aaaa", mouseCode, "DASDISAN")
+		print("OnMousePressed", mouseCode)
 		GMBuddy.LastClick = {}
 
 		local drive_ent = LocalPlayer():GetDrivingEntity()
 		if !IsValid(drive_ent) then return end
-		local player_pos = drive_ent:GetPos() -- Get the player's position
+		local player_pos = drive_ent:GetPos()
 		
 		if (mouseCode == MOUSE_MIDDLE) and !GMBuddy.HoveredBtn then
 			gui.EnableScreenClicker(false)
 			GMBuddy.bCam = true
-			--net.Start("GMBuddy.CamToggle")
-			--net.WriteBool(true)
-			--net.SendToServer()
 		end
 
 		if (mouseCode == MOUSE_LEFT) then
 			if GMBuddy.HoveredBtn then
 				GMBuddy.SelectedEnts[GMBuddy.HoveredBtn.ent] = true
-				--GMBuddy.SelectedEnts = {GMBuddy.HoveredBtn.ent}
 			else
 				GMBuddy.SelectedEnts = {}
 				local tr = util.TraceLine( {
@@ -71,6 +67,25 @@ function GMBuddy.CreateHermes()
 				GMBuddy.LastClick = {ThreeD = tr.HitPos, TwoD = {x = gui.MouseX(), y = gui.MouseY()}}
 			end
 		end
+
+		if (mouseCode == MOUSE_RIGHT) then
+			local tr = util.TraceLine( {
+				start = player_pos,
+				endpos = player_pos + drive_ent:GetAngles():Forward() + gui.ScreenToVector(gui.MousePos()) * 10000,
+			} )
+			local tosend = {}
+			for k, v in pairs(GMBuddy.SelectedEnts) do
+				if v == nil then continue end
+				if !k:IsNPC() then continue end
+				tosend[k] = v
+				GMBuddy.NavigatingEnts[k] = true
+				k.NavigateTarget = tr.HitPos
+			end
+			net.Start("GMBuddy.NPCRequestMove")
+			net.WriteVector(tr.HitPos)
+			net.WriteTable(tosend)
+			net.SendToServer()
+		end
 	end
 
 	function container:OnMouseReleased(mouseCode)
@@ -81,7 +96,7 @@ function GMBuddy.CreateHermes()
 		if !IsValid(LocalPlayer()) then return end
 		local drive_ent = LocalPlayer():GetDrivingEntity()
 		if !IsValid(drive_ent) then return end
-		local player_pos = drive_ent:GetPos() -- Get the player's position
+		local player_pos = drive_ent:GetPos()
 		
 		local hovered = 0
 		local buttons = {}
@@ -98,11 +113,6 @@ function GMBuddy.CreateHermes()
 			
 			-- Adjust icon size based on distance (e.g., icon size decreases as distance increases)
 			local icon_size = math.max(48 / (distance / 100), 32) -- Example scaling factor and minimum size
-			
-			-- Ensure the icon size doesn't become too small
-			if icon_size < 32 then
-				icon_size = 32
-			end
 			
 			-- Draw the icon centered at the entity's screen position
 			local half_size = icon_size / 2
@@ -136,7 +146,7 @@ function GMBuddy.CreateHermes()
 			local half_size = icon_size / 2
 			local screen_pos = v.screen_pos
 			surface.DrawRect(screen_pos.x - half_size, screen_pos.y - half_size, icon_size, icon_size) -- Actually draw the rectangle
-			surface.SetDrawColor( 0, 0, 0, 255 ) -- Set the drawing color
+			surface.SetDrawColor( 0, 0, 0, 255 )
 			surface.SetMaterial( GMBuddy.LookupUIMat("gmbuddy/biohazard-solid.png") ) -- Use our cached material
 			surface.DrawTexturedRect((screen_pos.x - half_size) + 4, (screen_pos.y - half_size) + 4, (icon_size) - 8, icon_size - 8) -- Actually draw the rectangle
 			surface.SetDrawColor(70, 70, 70, 255)
@@ -147,12 +157,10 @@ function GMBuddy.CreateHermes()
 		if !GMBuddy.LastClick.TwoD then return end
 		local click = GMBuddy.LastClick.TwoD
 		local col 
-		surface.SetDrawColor(cfg.Colors["WorldSelection"]) -- Set the drawing color
+		surface.SetDrawColor(cfg.Colors["WorldSelection"])
 		local drive_ent = LocalPlayer():GetDrivingEntity()
-		local player_pos = drive_ent:GetPos() -- Get the player's position
+		local player_pos = drive_ent:GetPos()
 		--debugoverlay.Line( player_pos, tr.HitPos, 5, Color(0, 255, 0), true )
-		print("yo?", player_pos, tr.HitPos)
-		print("hello??", click)
 		PrintTable(click)
 		local cur_x, cur_y = gui.MouseX(), gui.MouseY()
 		local left = math.min(click.x, cur_x)
@@ -165,12 +173,22 @@ function GMBuddy.CreateHermes()
 
 	function container:Think()
 		if !GMBuddy.LastClick.TwoD then return end
-		local boxMin = vector_zero
-		local boxMax = vector_zero
-	
-		-- Calculate box center
-		--local boxCenter = (boxMin + boxMax) / 2
-		--GMBuddy.FindInBoxRotated
+		GMBuddy.SelectedEnts = {}
+		local click = GMBuddy.LastClick.TwoD
+		local cur_x, cur_y = gui.MouseX(), gui.MouseY()
+		local left = math.min(click.x, cur_x)
+		local top = math.min(click.y, cur_y)
+		local width = math.abs(cur_x - click.x)
+		local height = math.abs(cur_y - click.y)
+		for k, v in ents.Iterator() do
+			if !GMBuddy.IsValid(v) then continue end
+			local screen_pos = v:EyePos():ToScreen()
+			if screen_pos.x < left then continue end
+			if screen_pos.x > left + width then continue end
+			if screen_pos.y < top then continue end
+			if screen_pos.y > top + height then continue end
+			GMBuddy.SelectedEnts[v] = true
+		end
 	end
 	local header = vgui.Create("DPanel", container)
 	local spawn_menu = vgui.Create("DPanel", container)
@@ -180,6 +198,14 @@ function GMBuddy.CreateHermes()
 	local options = {}
 	spawn_tree:Dock(FILL)
 	spawn_tree:SetLineHeight(20)
+	container.modifier_pnl = vgui.Create("DProperties", spawn_menu)
+	local modifier_pnl = container.modifier_pnl
+	modifier_pnl:Dock(BOTTOM)
+	modifier_pnl:SetHeight(ScrH() * 0.22)
+	local Row1 = modifier_pnl:CreateRow( "Category1", "Vector Color" )
+	Row1:Setup( "VectorColor" )
+	Row1:SetValue( Vector( 1, 0, 0 ) )
+	Row1.DataChanged = function( _, val ) print( val ) end
 	local edit_tree = vgui.Create("GMBTree", edit_menu)
 	edit_tree:Dock(FILL)
 	edit_tree:SetLineHeight(20)
@@ -264,21 +290,6 @@ end
 
 
 concommand.Add("gmb_ui_reload", function(ply, cmd, args)
-	/*local tr = util.TraceLine({
-		start = ply:GetPos(),
-		endpos = ply:GetPos() + ply:GetAngles():Up() * 100000,
-		mask = MASK_NPCWORLDSTATIC,
-	})
-	local camera_pos = tr.HitPos
-	camera_pos.z = math.min(tr.HitPos.z, 1000)
-	local camera_ang = Angle(45, ply:EyeAngles().yaw, 0)
-	if CLIENT then
-		GMBuddy.CameraPos = camera_pos
-		GMBuddy.CameraAng = camera_ang
-	else
-		ply.CameraPos = camera_pos
-		ply.CameraAng = camera_ang
-	end*/
 	if GMBuddy.Hermes then
 		GMBuddy.Hermes:Remove()
 		GMBuddy.Container:Remove()

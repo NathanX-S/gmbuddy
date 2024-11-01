@@ -37,3 +37,17 @@ net.Receive("GMBuddy.ModuleRequest", function(len, ply)
 	ent:ConsumeOptions(options)
 	ent:Spawn()
 end)
+
+net.Receive("GMBuddy.NPCRequestMove", function(len, ply)
+	if !(IsValid(ply) and ply:IsPlayer()) then return end
+	if !GMBuddy.PermsCheck(ply) then return end
+	local target_pos = net.ReadVector()
+	local entities = net.ReadTable()
+	for k, v in pairs(entities) do
+		if v != true then continue end
+		if !k:IsNPC() then continue end
+		k:SetLastPosition(target_pos)
+		k:ClearSchedule()
+		k:SetSchedule( SCHED_FORCED_GO_RUN )
+	end
+end)
